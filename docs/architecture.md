@@ -129,3 +129,12 @@ Example:
 curl -s localhost:4000/graphql -H 'content-type: application/json' \
   -d '{"query":"{ vehicles(filter:{q:\"golf diesel\", limit:2}) { total items { make model priceCents } } }"}'
 ```
+
+## Observability and delivery (Phase 6)
+
+See decision 0008 for the reasoning. In short: structured request logs (no secrets or personal data), a Prometheus histogram with low-cardinality labels, liveness vs readiness probes, optional Sentry.
+
+### Tests and coverage
+
+- Unit tests (`pnpm test`), integration tests against a real PostgreSQL (`pnpm --filter @dealer/api test:int`), and Playwright browser tests against the Docker stack.
+- API coverage comes from the integration tests only (they boot the real app). CI fails below 80% for statements, branches, functions and lines. Measured on 2026-10-10 (248 integration tests, one local run): statements 96.84%, branches 82.18%, functions 98.99%, lines 97.77%. Branches are the weakest figure (they were 80.0% before I added tests for the error filter and env validation), so the gate is tight on purpose. CI prints the figures in each run's summary.

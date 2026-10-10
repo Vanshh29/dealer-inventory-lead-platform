@@ -1,9 +1,41 @@
 # Dealer Inventory & Lead Platform
 
-Full-stack used-car dealer platform: public catalog, lead capture, and an admin back office.
-TypeScript end to end — Next.js, NestJS, PostgreSQL, Prisma (from Phase 1), Docker, GitHub Actions.
+A used-car dealer platform: a public catalog with full-text search, lead capture, and a role-based back office to work the lead pipeline. TypeScript end to end: Next.js, NestJS, PostgreSQL + Prisma, REST (OpenAPI) and a read-only GraphQL layer, Docker, GitHub Actions.
 
-> Status: **Phase 4 (frontend) complete**.
+![Catalog with filters](docs/screenshots/catalog.png)
+
+| Vehicle page and enquiry form                          | Back office leads table                          |
+| ------------------------------------------------------ | ------------------------------------------------ |
+| ![Vehicle detail](docs/screenshots/vehicle-detail.png) | ![Leads table](docs/screenshots/leads-table.png) |
+
+## Architecture
+
+```mermaid
+flowchart LR
+  V([Visitor]) --> W
+  S([Staff: ADMIN / SALES / VIEWER]) --> W
+  subgraph Docker Compose
+    W["web<br/>Next.js (SSR + client back office)"] -- "REST, cookies" --> A
+    A["api<br/>NestJS"] --> DB[("PostgreSQL 16<br/>tsvector + GIN")]
+    A --> U[("uploads volume<br/>StorageService")]
+  end
+  V -. "REST / GraphQL (read-only)" .-> A
+  P([Prometheus]) -. "/metrics" .-> A
+  A -. "errors, if SENTRY_DSN" .-> SE([Sentry])
+```
+
+Inside the API: global guards (rate limit, JWT, roles) protect every route unless it is marked `@Public()`. REST controllers and the GraphQL resolver call the same services; only the services touch Prisma. Details and the reasoning behind each choice: [`docs/architecture.md`](docs/architecture.md) and [`docs/decisions/`](docs/decisions).
+
+## Key design decisions
+
+- **Secure by default:** every route needs a login unless marked public; roles are enforced in server guards, the UI only hides things. Refresh tokens are single-use with reuse detection ([0002](docs/decisions/0002-auth-and-rbac.md)).
+- **Search in PostgreSQL**, not a separate engine: a generated `tsvector` column with a GIN index, plus filters. Measured timings are in the architecture doc ([0003](docs/decisions/0003-vehicles-and-search.md)).
+- **Leads are a state machine:** allowed transitions are defined once in `@dealer/shared`; changes use compare-and-set and write an audit entry in the same transaction ([0004](docs/decisions/0004-leads-and-audit.md)).
+- **One contract, checked on both sides:** zod response schemas shared by API tests and the web client ([0005](docs/decisions/0005-typed-api-client.md)).
+- **Lead view is a table, not a kanban** ([0006](docs/decisions/0006-frontend-and-lead-view.md)).
+- **GraphQL is a thin read-only view** of the catalog service, with depth and cost limits ([0007](docs/decisions/0007-graphql-catalog.md)).
+- **Observability without leaking data:** JSON logs without cookies or query strings, low-cardinality metrics, optional Sentry ([0008](docs/decisions/0008-observability.md)).
+- Money is integer cents everywhere.
 
 ## Quick start (Docker)
 
@@ -13,7 +45,8 @@ docker compose up --build
 ```
 
 - Web: http://localhost:3000
-- API health: http://localhost:4000/health
+- API health: http://localhost:4000/health (liveness) and `/health/ready` (needs the database)
+- Prometheus metrics: http://localhost:4000/metrics
 - API docs (Swagger UI): http://localhost:4000/api/docs
 - GraphQL (read-only catalog, `POST`): http://localhost:4000/graphql, see `docs/architecture.md` for an example
 - Staff back office: http://localhost:3000/admin (demo logins below)
@@ -44,6 +77,7 @@ pnpm --filter @dealer/web dev         # Web on :3000
 ```bash
 pnpm lint && pnpm typecheck && pnpm test && pnpm build
 pnpm test:int   # integration tests; needs Postgres on localhost:5432 with a `dealer_test` database
+pnpm --filter @dealer/api test:int:cov   # same, with a coverage report (fails below 80%)
 ```
 
 Create the test database once: `docker compose exec db psql -U dealer -d dealer -c 'CREATE DATABASE dealer_test'`.
@@ -81,6 +115,21 @@ docker compose exec api ./node_modules/.bin/tsx prisma/seed.ts
 pnpm exec playwright install chromium      # once
 pnpm test:e2e
 ```
+
+## Observability
+
+- **Logs:** one JSON line per request (pino) with a request id (`x-request-id`, kept if the caller sends a sane one). Cookies, tokens, query strings and bodies are never logged. `LOG_LEVEL` sets the level; pipe through `pino-pretty` for colours.
+- **Metrics:** `GET /metrics` (Prometheus text format): request duration histogram by method, route _pattern_ and status, plus Node process metrics. Set `METRICS_TOKEN` in production and give the scraper the same bearer token.
+- **Health:** `/health` says the process is up; `/health/ready` also checks the database (503 if it fails). Docker Compose uses the latter.
+- **Sentry:** only when `SENTRY_DSN` is set; reports unexpected (5xx) errors, not 4xx.
+
+## CI
+
+`.github/workflows/ci.yml` has two jobs. `verify`: install, lint, typecheck, unit tests, integration tests against a Postgres service with a coverage gate (80%), build. `e2e` (after `verify`): `docker compose up --wait`, seed, Playwright in Chromium, with the report uploaded on failure.
+
+## Regenerating screenshots
+
+With the stack running and seeded: `pnpm --filter @dealer/e2e screenshots`.
 
 ## Layout
 
