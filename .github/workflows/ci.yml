@@ -4,9 +4,15 @@ on:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
+    name: Lint, typecheck, unit, integration, build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     services:
       postgres:
         image: postgres:16-alpine
@@ -31,5 +37,57 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm --filter @dealer/api db:generate
       - run: pnpm test
-      - run: pnpm test:int
+      # Integration tests with coverage. jest.int.config.js fails the job below 80%.
+      - run: pnpm --filter @dealer/api test:int:cov 2>&1 | tee "$RUNNER_TEMP/cov.txt"
+      - name: Coverage summary
+        if: always()
+        run: |
+          {
+            echo '### API coverage (integration tests)'
+            echo '```'
+            sed -n '/Coverage summary/,/^=====*$/p' "$RUNNER_TEMP/cov.txt" | grep -v '^=*$'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-coverage
+          path: apps/api/coverage
+          retention-days: 14
       - run: pnpm build
+
+  e2e:
+    name: Browser tests (Playwright, full stack)
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Configure the stack
+        run: |
+          cp .env.example .env
+          # The browser tests sign in and submit leads many times a minute and want uncached data.
+          printf 'AUTH_RATE_LIMIT=100\nLEAD_RATE_LIMIT=100\nCATALOG_REVALIDATE_SECONDS=0\n' >> .env
+      - name: Start db, api and web
+        run: docker compose up --build -d --wait --wait-timeout 300
+      - name: Seed demo data
+        run: docker compose exec -T api ./node_modules/.bin/tsx prisma/seed.ts
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          retention-days: 7
+      - name: Container logs
+        if: failure()
+        run: docker compose logs --no-color --tail 200

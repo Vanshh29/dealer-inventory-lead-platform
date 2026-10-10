@@ -26,6 +26,13 @@ services:
       - '${API_PORT:-4000}:4000'
     volumes:
       - uploads:/repo/apps/api/uploads
+    healthcheck:
+      # Readiness (needs the database), so `docker compose up --wait` means "really usable".
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:4000/health/ready']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
     depends_on:
       db:
         condition: service_healthy
@@ -40,7 +47,8 @@ services:
     ports:
       - '${WEB_PORT:-3000}:3000'
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
 volumes:
   pgdata:
