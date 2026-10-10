@@ -1,4 +1,5 @@
 import { Body, Controller, Get, HttpCode, Post, Req, Res } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { CookieOptions, Request, Response } from 'express';
 import { AuthUser, CurrentUser, Public } from '../common/decorators';
@@ -33,12 +34,14 @@ function clearAuthCookies(res: Response): void {
 const refreshCookie = (req: Request): string | undefined =>
   (req.cookies as Record<string, string> | undefined)?.[REFRESH_COOKIE];
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
   @Public()
   @Throttle(authThrottle)
+  @ApiOperation({ summary: 'Log in; sets access and refresh cookies' })
   @Post('login')
   @HttpCode(200)
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response): Promise<AuthUser> {
@@ -49,6 +52,7 @@ export class AuthController {
 
   @Public()
   @Throttle(authThrottle)
+  @ApiOperation({ summary: 'Rotate the refresh token and issue a new access token' })
   @Post('refresh')
   @HttpCode(200)
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthUser> {
@@ -63,6 +67,7 @@ export class AuthController {
   }
 
   @Public()
+  @ApiOperation({ summary: 'Revoke the refresh token and clear cookies' })
   @Post('logout')
   @HttpCode(204)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
@@ -70,6 +75,7 @@ export class AuthController {
     clearAuthCookies(res);
   }
 
+  @ApiOperation({ summary: 'Current user' })
   @Get('me')
   me(@CurrentUser() user: AuthUser): AuthUser {
     return user;

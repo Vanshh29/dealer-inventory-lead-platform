@@ -6,3 +6,9 @@ process.env.DATABASE_URL = TEST_DATABASE_URL;
 process.env.JWT_ACCESS_SECRET = 'test-secret-test-secret-test-secret';
 process.env.AUTH_RATE_LIMIT = '1000';
 process.env.CORS_ORIGIN = 'http://localhost:3000';
+
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+process.env.UPLOADS_DIR = mkdtempSync(join(tmpdir(), 'dealer-uploads-'));

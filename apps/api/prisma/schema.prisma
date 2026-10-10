@@ -35,3 +35,65 @@ model RefreshToken {
 
   @@index([userId])
 }
+
+enum FuelType {
+  PETROL
+  DIESEL
+  ELECTRIC
+  HYBRID
+  PLUGIN_HYBRID
+  LPG
+}
+
+enum Gearbox {
+  MANUAL
+  AUTOMATIC
+}
+
+enum VehicleStatus {
+  DRAFT
+  PUBLISHED
+  RESERVED
+  SOLD
+}
+
+model Vehicle {
+  id           String                   @id @default(uuid())
+  vin          String                   @unique
+  make         String
+  model        String
+  variant      String?
+  year         Int
+  mileage      Int
+  // Integer cents. Never floats for money.
+  priceCents   Int
+  fuel         FuelType
+  gearbox      Gearbox
+  color        String
+  description  String                   @default("")
+  status       VehicleStatus            @default(DRAFT)
+  images       VehicleImage[]
+  // Generated column (see migration): weighted tsvector over make/model/variant/color/description.
+  searchVector Unsupported("tsvector")?
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+
+  @@index([searchVector], type: Gin)
+  @@index([status, priceCents])
+  @@index([status, year])
+  @@index([status, make, model])
+  @@index([status, mileage])
+  @@index([status, createdAt])
+}
+
+model VehicleImage {
+  id        String  @id @default(uuid())
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  // Storage key (file name); `url` is what clients load.
+  key       String  @unique
+  url       String
+  position  Int
+
+  @@index([vehicleId, position])
+}

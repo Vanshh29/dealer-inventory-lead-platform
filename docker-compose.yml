@@ -24,6 +24,8 @@ services:
       API_PORT: 4000
     ports:
       - '${API_PORT:-4000}:4000'
+    volumes:
+      - uploads:/repo/apps/api/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -42,3 +44,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:

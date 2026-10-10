@@ -1,12 +1,13 @@
 import { Controller, Get, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Role } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import * as argon2 from 'argon2';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { Roles } from '../src/common/decorators';
 import { PrismaService } from '../src/common/prisma.service';
 import { configureApp } from '../src/setup';
+import { setupSwagger } from '../src/swagger';
 
 export const PASSWORD = 'Sup3r-secret-pass!';
 
@@ -27,19 +28,21 @@ class RbacProbeController {
   }
 }
 
-export async function createApp(): Promise<INestApplication> {
+export async function createApp(opts: { swagger?: boolean } = {}): Promise<INestApplication> {
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule],
     controllers: [RbacProbeController],
   }).compile();
   const app = moduleRef.createNestApplication();
   configureApp(app);
+  if (opts.swagger) setupSwagger(app);
   await app.init();
   return app;
 }
 
 export async function resetDb(app: INestApplication): Promise<void> {
   const prisma = app.get(PrismaService);
+  await prisma.vehicle.deleteMany(); // images cascade
   await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany();
 }
@@ -62,3 +65,48 @@ export async function loginAs(app: INestApplication, role: Role) {
     .expect(200);
   return agent;
 }
+
+let vinCounter = 0;
+const VIN_CHARS = 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789';
+export function nextVin(): string {
+  let n = ++vinCounter;
+  let s = '';
+  for (let i = 0; i < 17; i++) {
+    s = VIN_CHARS[n % VIN_CHARS.length] + s;
+    n = Math.floor(n / VIN_CHARS.length);
+  }
+  return s;
+}
+
+export function vehicleData(
+  overrides: Partial<Prisma.VehicleCreateInput> = {},
+): Prisma.VehicleCreateInput {
+  return {
+    vin: nextVin(),
+    make: 'Volkswagen',
+    model: 'Golf',
+    variant: '2.0 TDI',
+    year: 2019,
+    mileage: 60_000,
+    priceCents: 1_500_000,
+    fuel: 'DIESEL',
+    gearbox: 'MANUAL',
+    color: 'Black',
+    description: 'Well maintained family hatchback',
+    status: 'PUBLISHED',
+    ...overrides,
+  };
+}
+
+export function createVehicle(
+  app: INestApplication,
+  overrides: Partial<Prisma.VehicleCreateInput> = {},
+) {
+  return app.get(PrismaService).vehicle.create({ data: vehicleData(overrides) });
+}
+
+/** Smallest valid PNG (1x1). */
+export const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64',
+);

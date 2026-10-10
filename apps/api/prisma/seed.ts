@@ -1,5 +1,6 @@
 import { PrismaClient, Role } from '@prisma/client';
 import * as argon2 from 'argon2';
+import { generateVehicles } from './seed-data';
 
 const prisma = new PrismaClient();
 
@@ -22,6 +23,20 @@ async function main(): Promise<void> {
     });
   }
   console.log(`Seeded ${users.length} users (one per role).`);
+
+  const count = Number(process.env.SEED_VEHICLES ?? 240);
+  const { vehicles, images } = generateVehicles(count);
+  const CHUNK = 1000;
+  for (let i = 0; i < vehicles.length; i += CHUNK) {
+    await prisma.vehicle.createMany({ data: vehicles.slice(i, i + CHUNK), skipDuplicates: true });
+  }
+  for (let i = 0; i < images.length; i += CHUNK) {
+    await prisma.vehicleImage.createMany({
+      data: images.slice(i, i + CHUNK),
+      skipDuplicates: true,
+    });
+  }
+  console.log(`Seeded ${count} vehicles with ${images.length} images (idempotent).`);
 }
 
 main()

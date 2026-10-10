@@ -7,5 +7,5 @@
     "experimentalDecorators": true,
     "incremental": true
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "prisma", "scripts"]
 }

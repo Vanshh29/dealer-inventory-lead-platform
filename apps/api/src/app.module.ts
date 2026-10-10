@@ -8,7 +8,10 @@ import { PrismaModule } from './common/prisma.module';
 import { RolesGuard } from './common/roles.guard';
 import { validateEnv } from './common/env';
 import { HealthController } from './health/health.controller';
+import { SearchModule } from './search/search.module';
+import { StorageModule } from './common/storage/storage.module';
 import { UsersModule } from './users/users.module';
+import { VehiclesModule } from './vehicles/vehicles.module';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { UsersModule } from './users/users.module';
     // Generous global default; auth endpoints tighten it with @Throttle.
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 300 }]),
     PrismaModule,
+    StorageModule,
+    VehiclesModule,
+    SearchModule,
     UsersModule,
     AuthModule,
   ],
