@@ -33,9 +33,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @dealer/shared build
+      # Lint and typecheck import the generated Prisma types, so generate first.
+      - run: pnpm --filter @dealer/api db:generate
       - run: pnpm lint
       - run: pnpm typecheck
-      - run: pnpm --filter @dealer/api db:generate
       - run: pnpm test
       # Integration tests with coverage. jest.int.config.js fails the job below 80%.
       - run: pnpm --filter @dealer/api test:int:cov 2>&1 | tee "$RUNNER_TEMP/cov.txt"
