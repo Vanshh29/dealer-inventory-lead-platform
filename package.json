@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test",
+    "test": "pnpm -r --filter '!@dealer/e2e' test",
     "test:int": "pnpm --filter @dealer/api test:int",
     "test:e2e": "pnpm --filter @dealer/e2e test"
   },
