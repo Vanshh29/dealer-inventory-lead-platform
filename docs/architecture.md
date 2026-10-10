@@ -99,7 +99,7 @@ Rules, concurrency handling, audit design and GDPR notes: `docs/decisions/0004-l
 | `AuditLog (actorId, createdAt)`          | what did this user do                            |
 | `AuditLog (createdAt)`                   | unfiltered newest-first list                     |
 
-## Web API client (Phase 4, part 1)
+## Web app and API client (Phase 4)
 
 ```
 @dealer/shared  api-schemas.ts (zod)  ──infers──▶  TS types
@@ -108,3 +108,13 @@ Rules, concurrency handling, audit design and GDPR notes: `docs/decisions/0004-l
 ```
 
 `apps/web/src/lib/api`: `http.ts` (request, errors, single-flight refresh), `client.ts` (typed endpoints), `errors.ts`, `index.ts` (`api`, `serverApi`, `assetUrl`). Rationale: `docs/decisions/0005-typed-api-client.md`.
+
+Frontend structure, the table-vs-kanban decision (with sources and the limits of that research), caching trade-offs and accessibility approach: `docs/decisions/0006-frontend-and-lead-view.md`.
+
+```
+apps/web/src/app
+  /                      home (server component)
+  /vehicles              catalog (server, URL-driven filters)    /vehicles/[id]  detail + lead form
+  /admin/login           staff login
+  /admin/(console)/…     session-gated: dashboard, leads, leads/[id], vehicles, vehicles/[id], vehicles/new
+```

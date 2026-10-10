@@ -17,7 +17,9 @@ const authThrottle = { default: { limit: authLimit, ttl: 60_000 } };
 const base = (): CookieOptions => ({
   httpOnly: true,
   sameSite: 'lax',
-  secure: process.env.NODE_ENV === 'production',
+  // Secure cookies need HTTPS. Default on in production; the local Docker demo runs over plain
+  // HTTP and sets COOKIE_SECURE=false (Safari refuses Secure cookies on http://localhost).
+  secure: (process.env.COOKIE_SECURE ?? String(process.env.NODE_ENV === 'production')) === 'true',
 });
 
 function setAuthCookies(res: Response, t: IssuedTokens): void {

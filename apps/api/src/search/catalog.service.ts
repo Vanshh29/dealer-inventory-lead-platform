@@ -55,6 +55,30 @@ export class CatalogService {
     return tsq ? this.fullText(query, tsq) : this.filtered(query);
   }
 
+  /** Makes (with models) of published vehicles and their counts, for the filter dropdowns. */
+  async facets(): Promise<{
+    makes: { make: string; count: number; models: { model: string; count: number }[] }[];
+  }> {
+    // Served by the (status, make, model) index.
+    const groups = await this.prisma.vehicle.groupBy({
+      by: ['make', 'model'],
+      where: { status: 'PUBLISHED' },
+      _count: { _all: true },
+      orderBy: [{ make: 'asc' }, { model: 'asc' }],
+    });
+    const byMake = new Map<
+      string,
+      { make: string; count: number; models: { model: string; count: number }[] }
+    >();
+    for (const g of groups) {
+      const entry = byMake.get(g.make) ?? { make: g.make, count: 0, models: [] };
+      entry.count += g._count._all;
+      entry.models.push({ model: g.model, count: g._count._all });
+      byMake.set(g.make, entry);
+    }
+    return { makes: [...byMake.values()] };
+  }
+
   async findPublished(id: string): Promise<VehicleWithImages> {
     const v = await this.prisma.vehicle.findFirst({
       where: { id, status: 'PUBLISHED' },

@@ -3,7 +3,7 @@
 Full-stack used-car dealer platform: public catalog, lead capture, and an admin back office.
 TypeScript end to end — Next.js, NestJS, PostgreSQL, Prisma (from Phase 1), Docker, GitHub Actions.
 
-> Status: **Phase 4 in progress (typed API client done; UI next)**.
+> Status: **Phase 4 (frontend) complete**.
 
 ## Quick start (Docker)
 
@@ -15,6 +15,7 @@ docker compose up --build
 - Web: http://localhost:3000
 - API health: http://localhost:4000/health
 - API docs (Swagger UI): http://localhost:4000/api/docs
+- Staff back office: http://localhost:3000/admin (demo logins below)
 
 The API applies migrations on start. Seed demo data: three users (admin/sales/viewer `@dealer.test`, password `Passw0rd!Passw0rd!`, local use only) 240 vehicles (`SEED_VEHICLES=n`) and 40 demo leads (`SEED_LEADS=n`). Safe to run repeatedly:
 
@@ -59,6 +60,26 @@ curl -b jar -X PATCH -H 'content-type: application/json' -d '{"status":"CONTACTE
 ```
 
 Search performance numbers (measured, with caveats): `docs/architecture.md`.
+
+## Using the site
+
+- **Public:** `/` search and latest cars · `/vehicles` catalog with filters, sorting and pagination (state is in the URL) · `/vehicles/<id>` photos, specs and the enquiry form.
+- **Back office** (`/admin`, log in with `admin@dealer.test`, `sales@dealer.test` or `viewer@dealer.test`, password `Passw0rd!Passw0rd!`): dashboard with pipeline counts · **Leads** table (filter by status, search, open a lead to change status, assign, add notes; admins also see its history) · **Vehicles** (create, edit, photos, delete: admin only).
+- Roles: ADMIN everything · SALES works leads and notes, reads vehicles · VIEWER read-only. The server enforces this; the UI only hides what you cannot do.
+
+## Browser tests (Playwright)
+
+They drive the real stack in Chromium and fail on any console error or unexpected HTTP error.
+
+```bash
+cp -n .env.example .env
+# the tests sign in many times a minute and want uncached data:
+printf 'AUTH_RATE_LIMIT=100\nLEAD_RATE_LIMIT=100\nCATALOG_REVALIDATE_SECONDS=0\n' >> .env
+docker compose up --build -d
+docker compose exec api ./node_modules/.bin/tsx prisma/seed.ts
+pnpm exec playwright install chromium      # once
+pnpm test:e2e
+```
 
 ## Layout
 

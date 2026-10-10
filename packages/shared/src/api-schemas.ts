@@ -123,6 +123,33 @@ export const auditLogSchema = z.object({
 });
 export type AuditLogEntry = z.infer<typeof auditLogSchema>;
 
+export const facetsSchema = z.object({
+  makes: z.array(
+    z.object({
+      make: z.string(),
+      count: z.number().int(),
+      models: z.array(z.object({ model: z.string(), count: z.number().int() })),
+    }),
+  ),
+});
+export type Facets = z.infer<typeof facetsSchema>;
+
+export const statsSchema = z.object({
+  leads: z.object(
+    Object.fromEntries(LEAD_STATUSES.map((s) => [s, z.number().int()])) as Record<
+      (typeof LEAD_STATUSES)[number],
+      z.ZodNumber
+    >,
+  ),
+  vehicles: z.object(
+    Object.fromEntries(VEHICLE_STATUSES.map((s) => [s, z.number().int()])) as Record<
+      (typeof VEHICLE_STATUSES)[number],
+      z.ZodNumber
+    >,
+  ),
+});
+export type Stats = z.infer<typeof statsSchema>;
+
 export const leadReceivedSchema = z.object({ received: z.literal(true) });
 
 /* ---------- Request shapes (what clients send) ---------- */

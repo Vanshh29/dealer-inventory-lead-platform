@@ -1,9 +1,11 @@
 import {
   auditLogSchema,
+  facetsSchema,
   authUserSchema,
   leadNoteSchema,
   leadReceivedSchema,
   leadSchema,
+  statsSchema,
   pageSchema,
   userSchema,
   vehicleImageSchema,
@@ -11,6 +13,8 @@ import {
 } from '@dealer/shared';
 import type {
   AuditLogEntry,
+  Facets,
+  Stats,
   AuthUser,
   CatalogParams,
   Lead,
@@ -64,6 +68,8 @@ export function createApiClient(config: HttpConfig, http: Http = createHttp(conf
         params: CatalogParams = {},
         init?: RequestInit & { next?: { revalidate?: number } },
       ) => request<Page<Vehicle>>('/vehicles', { query: { ...params }, schema: vehiclePage, init }),
+      facets: (init?: RequestInit & { next?: { revalidate?: number } }) =>
+        request<Facets>('/vehicles/facets', { schema: facetsSchema, init }),
       get: (id: string, init?: RequestInit & { next?: { revalidate?: number } }) =>
         request<Vehicle>(`/vehicles/${id}`, { schema: vehicleSchema, init }),
     },
@@ -145,6 +151,8 @@ export function createApiClient(config: HttpConfig, http: Http = createHttp(conf
         create: (input: UserInput) =>
           request<User>('/users', { method: 'POST', body: input, schema: userSchema }),
       },
+
+      stats: () => request<Stats>('/admin/stats', { schema: statsSchema }),
 
       auditLogs: (
         params: PageParams & { entity?: string; entityId?: string; actorId?: string } = {},

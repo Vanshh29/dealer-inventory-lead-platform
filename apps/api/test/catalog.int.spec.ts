@@ -93,6 +93,18 @@ describe('Public catalog and search', () => {
     });
   });
 
+  describe('facets', () => {
+    it('lists makes with models and counts for published vehicles only', async () => {
+      const res = await get('/vehicles/facets').expect(200);
+      const vw = res.body.makes.find((m: { make: string }) => m.make === 'Volkswagen');
+      expect(vw).toMatchObject({ count: 2 });
+      expect(vw.models.map((m: { model: string }) => m.model)).toEqual(['Golf', 'Passat']);
+      // the SOLD Audi A4 and RESERVED A6 must not leak through facets
+      const audi = res.body.makes.find((m: { make: string }) => m.make === 'Audi');
+      expect(audi.models).toEqual([{ model: 'A3', count: 1 }]);
+    });
+  });
+
   describe('filters', () => {
     it.each([
       ['make', '?make=Volkswagen', ['Golf', 'Passat']],

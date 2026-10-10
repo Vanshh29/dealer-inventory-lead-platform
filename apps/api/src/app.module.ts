@@ -12,6 +12,7 @@ import { HealthController } from './health/health.controller';
 import { LeadsModule } from './leads/leads.module';
 import { SearchModule } from './search/search.module';
 import { StorageModule } from './common/storage/storage.module';
+import { StatsModule } from './stats/stats.module';
 import { UsersModule } from './users/users.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 
@@ -26,6 +27,7 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     VehiclesModule,
     SearchModule,
     LeadsModule,
+    StatsModule,
     UsersModule,
     AuthModule,
   ],

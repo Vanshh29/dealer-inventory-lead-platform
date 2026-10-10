@@ -16,6 +16,15 @@ export class CatalogController {
     return this.catalog.search(query);
   }
 
+  // Declared before ':id' so "facets" is not parsed as an id.
+  @Get('facets')
+  @ApiOperation({
+    summary: 'Makes and models of published vehicles with counts (filter dropdowns)',
+  })
+  facets() {
+    return this.catalog.facets();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get one published vehicle' })
   get(@Param('id', ParseUUIDPipe) id: string) {

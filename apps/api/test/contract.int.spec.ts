@@ -7,6 +7,7 @@ import {
   leadReceivedSchema,
   leadSchema,
   pageSchema,
+  statsSchema,
   userSchema,
   vehicleImageSchema,
   vehicleSchema,
@@ -157,6 +158,16 @@ describe('API response contracts (shared zod schemas)', () => {
     await admin.delete(`/admin/vehicles/${orphanVehicle.id}`).expect(204);
     const body = (await admin.get(`/admin/leads/${lead.id}`).expect(200)).body;
     expect(leadSchema.parse(body).vehicle).toBeNull();
+  });
+
+  it('dashboard stats: every status present, for every role', async () => {
+    for (const role of ['ADMIN', 'SALES', 'VIEWER'] as const) {
+      const res = await (await loginAs(app, role)).get('/admin/stats').expect(200);
+      const stats = statsSchema.parse(res.body);
+      expect(Object.keys(stats.leads)).toHaveLength(6);
+      expect(Object.keys(stats.vehicles)).toHaveLength(4);
+    }
+    await request(app.getHttpServer()).get('/admin/stats').expect(401);
   });
 
   it('audit log page', async () => {

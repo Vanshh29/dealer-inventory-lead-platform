@@ -22,6 +22,7 @@ describe('OpenAPI', () => {
     ['/users', 'get'],
     ['/users', 'post'],
     ['/vehicles', 'get'],
+    ['/vehicles/facets', 'get'],
     ['/vehicles/{id}', 'get'],
     ['/admin/vehicles', 'get'],
     ['/admin/vehicles', 'post'],
@@ -36,6 +37,7 @@ describe('OpenAPI', () => {
     ['/admin/leads/{id}/notes', 'get'],
     ['/admin/leads/{id}/notes', 'post'],
     ['/admin/audit-logs', 'get'],
+    ['/admin/stats', 'get'],
     ['/admin/vehicles/{id}/images', 'post'],
     ['/admin/vehicles/{id}/images/{imageId}', 'delete'],
   ];
