@@ -1,5 +1,5 @@
 // Regenerates docs/screenshots from the running stack:  pnpm --filter @dealer/e2e screenshots
-import { chromium } from '@playwright/test';
+import { chromium, devices } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -40,5 +40,17 @@ await shot('leads-table');
 await page.getByRole('table').getByRole('link').first().click();
 await page.waitForURL(/\/admin\/leads\/[0-9a-f-]{36}/);
 await shot('lead-detail', true);
+
+// Phone: the filters hide behind the three-line button.
+const phone = await (
+  await browser.newContext({ ...devices['iPhone 13'], viewport: { width: 390, height: 844 } })
+).newPage();
+await phone.goto(`${base}/vehicles?fuel=DIESEL`);
+await phone.waitForLoadState('networkidle');
+await phone.screenshot({ path: `${out}mobile-catalog.png` });
+await phone.getByRole('button', { name: /Filters/ }).tap();
+await phone.waitForTimeout(500);
+await phone.screenshot({ path: `${out}mobile-filters.png` });
+console.log('saved mobile-catalog, mobile-filters');
 
 await browser.close();

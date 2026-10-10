@@ -19,19 +19,19 @@ export function LeadsTable({ items }: { items: Lead[] }) {
         <caption className="sr-only">Leads, newest first</caption>
         <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-700">
           <tr>
-            <th scope="col" className="px-4 py-3.5 font-semibold">
+            <th scope="col" className="hidden px-4 py-3.5 font-semibold md:table-cell">
               Received
             </th>
             <th scope="col" className="px-4 py-3.5 font-semibold">
               Customer
             </th>
-            <th scope="col" className="px-4 py-3.5 font-semibold">
+            <th scope="col" className="hidden px-4 py-3.5 font-semibold md:table-cell">
               Vehicle
             </th>
             <th scope="col" className="px-4 py-3.5 font-semibold">
               Status
             </th>
-            <th scope="col" className="px-4 py-3.5 font-semibold">
+            <th scope="col" className="hidden px-4 py-3.5 font-semibold lg:table-cell">
               Assigned to
             </th>
           </tr>
@@ -39,7 +39,7 @@ export function LeadsTable({ items }: { items: Lead[] }) {
         <tbody className="divide-y divide-slate-100">
           {items.map((lead) => (
             <tr key={lead.id} className="transition-colors hover:bg-blue-50/50">
-              <td className="whitespace-nowrap px-4 py-3 text-slate-700">
+              <td className="hidden whitespace-nowrap px-4 py-3 text-slate-700 md:table-cell">
                 {formatDate(lead.createdAt)}
               </td>
               <th scope="row" className="px-4 py-3 font-normal">
@@ -49,9 +49,13 @@ export function LeadsTable({ items }: { items: Lead[] }) {
                 >
                   {lead.name}
                 </Link>
-                <span className="block text-slate-600">{lead.email}</span>
+                <span className="block break-all text-slate-600">{lead.email}</span>
+                <span className="mt-0.5 block text-xs text-slate-600 md:hidden">
+                  {formatDate(lead.createdAt)}
+                  {lead.vehicle && ` · ${vehicleTitle(lead.vehicle)}`}
+                </span>
               </th>
-              <td className="px-4 py-3">
+              <td className="hidden px-4 py-3 md:table-cell">
                 {lead.vehicle ? (
                   <Link href={`/admin/vehicles/${lead.vehicle.id}`} className="hover:underline">
                     {vehicleTitle(lead.vehicle)}
@@ -64,7 +68,9 @@ export function LeadsTable({ items }: { items: Lead[] }) {
               <td className="px-4 py-3">
                 <LeadStatusBadge status={lead.status} />
               </td>
-              <td className="px-4 py-3 text-slate-700">{lead.assignedTo?.email ?? '—'}</td>
+              <td className="hidden px-4 py-3 text-slate-700 lg:table-cell">
+                {lead.assignedTo?.email ?? '—'}
+              </td>
             </tr>
           ))}
         </tbody>

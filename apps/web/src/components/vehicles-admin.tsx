@@ -23,7 +23,7 @@ export function VehiclesTable({ items }: { items: Vehicle[] }) {
             <th scope="col" className="px-4 py-3 font-medium">
               Vehicle
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="hidden px-4 py-3 font-medium md:table-cell">
               Year · Mileage
             </th>
             <th scope="col" className="px-4 py-3 text-right font-medium">
@@ -37,16 +37,19 @@ export function VehiclesTable({ items }: { items: Vehicle[] }) {
         <tbody className="divide-y divide-slate-100">
           {items.map((v) => (
             <tr key={v.id} className="hover:bg-slate-50">
-              <th scope="row" className="px-4 py-3 font-normal">
+              <th scope="row" className="px-3 py-3 font-normal sm:px-4">
                 <div className="flex items-center gap-3">
                   {v.images[0] ? (
                     <img
                       src={assetUrl(v.images[0].url)}
                       alt=""
-                      className="h-10 w-14 rounded object-cover"
+                      className="hidden h-10 w-14 rounded object-cover sm:block"
                     />
                   ) : (
-                    <span aria-hidden="true" className="h-10 w-14 rounded bg-slate-200" />
+                    <span
+                      aria-hidden="true"
+                      className="hidden h-10 w-14 rounded bg-slate-200 sm:block"
+                    />
                   )}
                   <div>
                     <Link
@@ -55,14 +58,14 @@ export function VehiclesTable({ items }: { items: Vehicle[] }) {
                     >
                       {vehicleTitle(v)}
                     </Link>
-                    <span className="block text-xs text-slate-600">{v.vin}</span>
+                    <span className="hidden text-xs text-slate-600 sm:block">{v.vin}</span>
                   </div>
                 </div>
               </th>
-              <td className="px-4 py-3 text-slate-700">
+              <td className="hidden px-4 py-3 text-slate-700 md:table-cell">
                 {v.year} · {formatKm(v.mileage)}
               </td>
-              <td className="whitespace-nowrap px-4 py-3 text-right font-medium">
+              <td className="whitespace-nowrap px-2 py-3 text-right font-medium sm:px-4">
                 {formatEuro(v.priceCents)}
               </td>
               <td className="px-4 py-3">

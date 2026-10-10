@@ -62,8 +62,8 @@ export function ConsoleShell({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
-        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-          <div className="flex items-center gap-3">
+        <div className="mt-3 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-card md:mt-4 md:block md:p-4">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <span
               aria-hidden="true"
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-sm font-bold uppercase text-white"
@@ -81,7 +81,7 @@ export function ConsoleShell({ children }: { children: ReactNode }) {
           </div>
           <Button
             variant="secondary"
-            className="mt-4 w-full"
+            className="shrink-0 md:mt-4 md:w-full"
             onClick={() => void logout().then(() => router.replace('/admin/login'))}
           >
             Log out

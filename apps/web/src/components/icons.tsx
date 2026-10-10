@@ -92,3 +92,5 @@ export const CarIcon = (p: P) => (
 export const GridIcon = (p: P) => (
   <Icon {...p} d={['M4 4h7v7H4z', 'M13 4h7v7h-7z', 'M4 13h7v7H4z', 'M13 13h7v7h-7z']} />
 );
+export const MenuIcon = (p: P) => <Icon {...p} strokeWidth={2.2} d="M4 6h16M4 12h16M4 18h16" />;
+export const CloseIcon = (p: P) => <Icon {...p} strokeWidth={2.2} d="M6 6l12 12M18 6 6 18" />;

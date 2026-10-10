@@ -145,7 +145,7 @@ export default async function HomePage() {
       </section>
 
       <section aria-labelledby="latest-title">
-        <div className="mb-6 flex items-end justify-between">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
           <div>
             <h2 id="latest-title" className="text-2xl font-bold tracking-tight">
               Latest arrivals
@@ -154,7 +154,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/vehicles"
-            className="inline-flex items-center gap-1 text-sm font-semibold text-blue-800 hover:underline"
+            className="inline-flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-blue-800 hover:underline"
           >
             Browse all cars <ArrowIcon className="h-4 w-4" />
           </Link>

@@ -58,23 +58,11 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
         </Link>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-        <div>
+      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:gap-8">
+        <div className="lg:col-start-1 lg:row-start-1">
           <Gallery images={v.images} title={title} vehicle={v} />
-          {v.description && (
-            <section
-              aria-labelledby="desc-title"
-              className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-card"
-            >
-              <h2 id="desc-title" className="text-lg font-semibold">
-                Description
-              </h2>
-              <p className="mt-2 whitespace-pre-line text-slate-800">{v.description}</p>
-            </section>
-          )}
         </div>
-
-        <div className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+        <div className="space-y-5 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
           <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
             <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
             <p className="mt-3 text-4xl font-extrabold tracking-tight text-blue-800">
@@ -112,6 +100,17 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
             <LeadForm vehicleId={v.id} vehicleTitle={title} />
           </section>
         </div>
+        {v.description && (
+          <section
+            aria-labelledby="desc-title"
+            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card lg:col-start-1 lg:row-start-2"
+          >
+            <h2 id="desc-title" className="text-lg font-semibold">
+              Description
+            </h2>
+            <p className="mt-2 whitespace-pre-line text-slate-800">{v.description}</p>
+          </section>
+        )}
       </div>
     </article>
   );

@@ -3,6 +3,7 @@ import { api, describeError } from '@/lib/api';
 import { catalogRevalidate, facetsRevalidate } from '@/lib/cache';
 import { catalogHref, parseCatalogSearch, type RawSearchParams } from '@/lib/catalog-params';
 import { CatalogFilters } from '@/components/catalog-filters';
+import { FilterDrawer } from '@/components/filter-drawer';
 import { VehicleGrid } from '@/components/vehicle-card';
 import { EmptyState, ErrorState, LinkButton, Pagination } from '@/components/ui';
 
@@ -22,16 +23,13 @@ export default async function CatalogPage({
   ]);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
-      <aside
-        aria-label="Filters"
-        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card lg:sticky lg:top-24 lg:self-start"
-      >
+    <div className="lg:grid lg:grid-cols-[18rem_1fr] lg:gap-8">
+      <FilterDrawer activeCount={Object.keys(state).filter((k) => k !== 'sort').length}>
         <CatalogFilters
           facets={facets.status === 'fulfilled' ? facets.value : null}
           state={state}
         />
-      </aside>
+      </FilterDrawer>
 
       <section aria-labelledby="catalog-title">
         <h1 id="catalog-title" className="text-3xl font-bold tracking-tight">
