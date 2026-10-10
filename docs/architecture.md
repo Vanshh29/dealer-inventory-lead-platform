@@ -118,3 +118,14 @@ apps/web/src/app
   /admin/login           staff login
   /admin/(console)/…     session-gated: dashboard, leads, leads/[id], vehicles, vehicles/[id], vehicles/new
 ```
+
+## GraphQL catalog (Phase 5)
+
+`POST /graphql` is a thin, read-only view of `CatalogService` (see decision 0007). The request path is: Express → throttler → resolver (public) → validation of the input type → `CatalogService` → Prisma. Query documents are validated by two rules before execution (queries only, depth ≤ 6) and by a complexity plugin (budget 2,500) before the resolver runs, so a rejected query costs no SQL.
+
+Example:
+
+```bash
+curl -s localhost:4000/graphql -H 'content-type: application/json' \
+  -d '{"query":"{ vehicles(filter:{q:\"golf diesel\", limit:2}) { total items { make model priceCents } } }"}'
+```

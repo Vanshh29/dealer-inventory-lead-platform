@@ -15,6 +15,7 @@ docker compose up --build
 - Web: http://localhost:3000
 - API health: http://localhost:4000/health
 - API docs (Swagger UI): http://localhost:4000/api/docs
+- GraphQL (read-only catalog, `POST`): http://localhost:4000/graphql, see `docs/architecture.md` for an example
 - Staff back office: http://localhost:3000/admin (demo logins below)
 
 The API applies migrations on start. Seed demo data: three users (admin/sales/viewer `@dealer.test`, password `Passw0rd!Passw0rd!`, local use only) 240 vehicles (`SEED_VEHICLES=n`) and 40 demo leads (`SEED_LEADS=n`). Safe to run repeatedly:
