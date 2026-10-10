@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { AuditModule } from './audit/audit.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './common/jwt-auth.guard';
 import { PrismaModule } from './common/prisma.module';
 import { RolesGuard } from './common/roles.guard';
 import { validateEnv } from './common/env';
 import { HealthController } from './health/health.controller';
+import { LeadsModule } from './leads/leads.module';
 import { SearchModule } from './search/search.module';
 import { StorageModule } from './common/storage/storage.module';
 import { UsersModule } from './users/users.module';
@@ -20,8 +22,10 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 300 }]),
     PrismaModule,
     StorageModule,
+    AuditModule,
     VehiclesModule,
     SearchModule,
+    LeadsModule,
     UsersModule,
     AuthModule,
   ],

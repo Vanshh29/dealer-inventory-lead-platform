@@ -328,3 +328,88 @@ export function generateVehicles(count: number, referenceYear = 2026) {
   }
   return { vehicles, images };
 }
+
+const FIRST = [
+  'Anna',
+  'Ben',
+  'Clara',
+  'David',
+  'Elif',
+  'Felix',
+  'Greta',
+  'Hans',
+  'Ines',
+  'Jonas',
+  'Katrin',
+  'Lukas',
+];
+const LAST = [
+  'Schmidt',
+  'Weber',
+  'Yilmaz',
+  'Fischer',
+  'Wagner',
+  'Becker',
+  'Hoffmann',
+  'Koch',
+  'Richter',
+  'Klein',
+];
+const MESSAGES = [
+  'Is this car still available? I would like to arrange a test drive.',
+  'Could you send me the service history, please?',
+  'Is the price negotiable? I could pick it up this weekend.',
+  'Does the car come with winter tyres?',
+  'I am interested in financing options for this vehicle.',
+];
+
+/** Demo leads for published vehicles, spread over the pipeline. Fake people, example.com addresses. */
+export function generateLeads(
+  vehicles: Prisma.VehicleCreateManyInput[],
+  count: number,
+  salesUserId: string,
+) {
+  const rand = mulberry32(7);
+  const pick = <T>(arr: T[]): T => arr[Math.floor(rand() * arr.length)];
+  const published = vehicles.filter((v) => v.status === 'PUBLISHED');
+  const statuses = [
+    'NEW',
+    'NEW',
+    'NEW',
+    'CONTACTED',
+    'CONTACTED',
+    'TEST_DRIVE',
+    'OFFER',
+    'WON',
+    'LOST',
+  ] as const;
+
+  const leads: Prisma.LeadCreateManyInput[] = [];
+  const notes: Prisma.LeadNoteCreateManyInput[] = [];
+  for (let i = 0; i < count; i++) {
+    const first = pick(FIRST);
+    const last = pick(LAST);
+    const status = pick([...statuses]);
+    const id = uuidFor(`lead-${i}`);
+    leads.push({
+      id,
+      vehicleId: pick(published).id as string,
+      name: `${first} ${last}`,
+      email: `${first}.${last}${i}@example.com`.toLowerCase(),
+      phone: rand() < 0.6 ? `+49 170 ${String(1000000 + Math.floor(rand() * 8999999))}` : null,
+      message: pick(MESSAGES),
+      status,
+      assignedToId: status === 'NEW' ? null : salesUserId,
+      createdAt: new Date(Date.UTC(2026, 5, 1) + Math.floor(rand() * 120) * 86_400_000),
+    });
+    if (status !== 'NEW') {
+      notes.push({
+        id: uuidFor(`lead-${i}-note`),
+        leadId: id,
+        authorId: salesUserId,
+        text: 'Called the customer and sent the details by email.',
+      });
+    }
+  }
+  return { leads, notes };
+}

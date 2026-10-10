@@ -3,7 +3,7 @@
 Full-stack used-car dealer platform: public catalog, lead capture, and an admin back office.
 TypeScript end to end — Next.js, NestJS, PostgreSQL, Prisma (from Phase 1), Docker, GitHub Actions.
 
-> Status: **Phase 2 (vehicles and search) complete**.
+> Status: **Phase 3 (leads pipeline) complete**.
 
 ## Quick start (Docker)
 
@@ -16,7 +16,7 @@ docker compose up --build
 - API health: http://localhost:4000/health
 - API docs (Swagger UI): http://localhost:4000/api/docs
 
-The API applies migrations on start. Seed demo data: three users (admin/sales/viewer `@dealer.test`, password `Passw0rd!Passw0rd!`, local use only) and 240 vehicles (`SEED_VEHICLES=n` to change). Safe to run repeatedly:
+The API applies migrations on start. Seed demo data: three users (admin/sales/viewer `@dealer.test`, password `Passw0rd!Passw0rd!`, local use only) 240 vehicles (`SEED_VEHICLES=n`) and 40 demo leads (`SEED_LEADS=n`). Safe to run repeatedly:
 
 ```bash
 docker compose exec api ./node_modules/.bin/tsx prisma/seed.ts
@@ -52,6 +52,10 @@ Create the test database once: `docker compose exec db psql -U dealer -d dealer 
 curl 'http://localhost:4000/vehicles?q=golf&fuel=DIESEL&sort=price_asc&limit=5'
 curl -c jar -H 'content-type: application/json' -d '{"email":"admin@dealer.test","password":"Passw0rd!Passw0rd!"}' http://localhost:4000/auth/login
 curl -b jar http://localhost:4000/admin/vehicles?status=DRAFT
+# submit a lead (public), then work it as sales
+curl -H 'content-type: application/json' -d '{"vehicleId":"<id of a published vehicle>","name":"Erika","email":"e@example.com","message":"Still available?"}' http://localhost:4000/leads
+curl -b jar 'http://localhost:4000/admin/leads?status=NEW'
+curl -b jar -X PATCH -H 'content-type: application/json' -d '{"status":"CONTACTED"}' http://localhost:4000/admin/leads/<lead id>/status
 ```
 
 Search performance numbers (measured, with caveats): `docs/architecture.md`.

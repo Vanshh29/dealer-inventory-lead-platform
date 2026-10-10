@@ -1,4 +1,4 @@
-import { generateVehicles } from './seed-data';
+import { generateLeads, generateVehicles } from './seed-data';
 
 describe('seed data generator', () => {
   const { vehicles, images } = generateVehicles(240);
@@ -29,5 +29,24 @@ describe('seed data generator', () => {
 
   it('has a healthy share of published vehicles', () => {
     expect(vehicles.filter((v) => v.status === 'PUBLISHED').length).toBeGreaterThan(120);
+  });
+});
+
+describe('demo lead generator', () => {
+  const { vehicles } = generateVehicles(240);
+  const { leads, notes } = generateLeads(vehicles, 40, 'sales-user-id');
+
+  it('only targets published vehicles and is deterministic', () => {
+    const published = new Set(vehicles.filter((v) => v.status === 'PUBLISHED').map((v) => v.id));
+    expect(leads.every((l) => published.has(l.vehicleId as string))).toBe(true);
+    expect(generateLeads(vehicles, 40, 'sales-user-id').leads).toEqual(leads);
+  });
+
+  it('spreads leads over the pipeline and only assigns/annotates leads that were worked on', () => {
+    expect(new Set(leads.map((l) => l.status)).size).toBeGreaterThan(3);
+    expect(leads.filter((l) => l.status === 'NEW').every((l) => l.assignedToId === null)).toBe(
+      true,
+    );
+    expect(notes).toHaveLength(leads.filter((l) => l.status !== 'NEW').length);
   });
 });

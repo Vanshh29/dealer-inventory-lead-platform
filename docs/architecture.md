@@ -68,3 +68,33 @@ Honest reading:
 - On the seeded data (240 rows) every query is around or under 1 ms; PostgreSQL scans such a small table regardless of indexes.
 - The 20,000-row run was done on a throw-away database to see behaviour at scale. There, `EXPLAIN ANALYZE` shows the planner choosing a **sequential scan (~4.7 ms)** for `volkswagen diesel`, because the synthetic data has only ~11 makes, so those terms match ~2–4 % of rows and the planner judges scanning cheaper. For a selective term, the GIN index **is** used (`Bitmap Index Scan on "Vehicle_searchVector_idx"`, ~2.4 ms for a text-only predicate with a rare term). Real inventories have a much wider vocabulary, so selective terms are the common case. This is a statement about this synthetic data, not a guarantee.
 - Further headroom if needed: a partial GIN index `WHERE status = 'PUBLISHED'`, or ranking only the top-N matches.
+
+## Leads and audit (Phase 3)
+
+| Endpoint                                                                                            | Access                         |
+| --------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `POST /leads`                                                                                       | public, rate-limited, honeypot |
+| `GET /admin/leads`, `GET /admin/leads/:id`, `GET /admin/leads/:id/notes`                            | any logged-in role             |
+| `PATCH /admin/leads/:id/status`, `PATCH /admin/leads/:id/assignment`, `POST /admin/leads/:id/notes` | SALES, ADMIN                   |
+| `GET /admin/audit-logs`                                                                             | ADMIN                          |
+
+Data model: `Lead(vehicleId?, name, email, phone?, message, status, assignedToId?)`, `LeadNote(leadId, authorId, text)`, `AuditLog(actorId?, action, entity, entityId, metadata)`.
+
+```
+NEW → CONTACTED → TEST_DRIVE → OFFER → WON     any open state → LOST     (WON/LOST terminal)
+```
+
+Rules, concurrency handling, audit design and GDPR notes: `docs/decisions/0004-leads-and-audit.md`.
+
+### Indexes added in Phase 3
+
+| Index                                    | Why                                              |
+| ---------------------------------------- | ------------------------------------------------ |
+| `Lead (status, createdAt)`               | lead list/board filtered by status, newest first |
+| `Lead (assignedToId, status)`            | "my open leads"                                  |
+| `Lead (vehicleId)`                       | leads per vehicle; FK lookups                    |
+| `Lead (createdAt)`                       | unfiltered newest-first list                     |
+| `LeadNote (leadId, createdAt)`           | notes of one lead in order                       |
+| `AuditLog (entity, entityId, createdAt)` | history of one entity                            |
+| `AuditLog (actorId, createdAt)`          | what did this user do                            |
+| `AuditLog (createdAt)`                   | unfiltered newest-first list                     |

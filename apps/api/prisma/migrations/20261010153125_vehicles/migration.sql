@@ -25,6 +25,7 @@ CREATE TABLE "Vehicle" (
     -- Generated and kept in sync by PostgreSQL itself: no triggers, no app code, cannot drift.
     -- 'simple' config: no stemming/stop-words, because make and model names are not natural language
     -- and listings mix German and English. Weights: A make/model, B variant, C colour, D description.
+    -- fuel/gearbox are enums (enum->text is not immutable) and are filter-only.
     "searchVector" tsvector GENERATED ALWAYS AS (
         setweight(to_tsvector('simple', coalesce("make", '') || ' ' || coalesce("model", '')), 'A') ||
         setweight(to_tsvector('simple', coalesce("variant", '')), 'B') ||

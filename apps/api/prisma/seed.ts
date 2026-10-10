@@ -1,6 +1,6 @@
 import { PrismaClient, Role } from '@prisma/client';
 import * as argon2 from 'argon2';
-import { generateVehicles } from './seed-data';
+import { generateLeads, generateVehicles } from './seed-data';
 
 const prisma = new PrismaClient();
 
@@ -37,6 +37,12 @@ async function main(): Promise<void> {
     });
   }
   console.log(`Seeded ${count} vehicles with ${images.length} images (idempotent).`);
+
+  const sales = await prisma.user.findUniqueOrThrow({ where: { email: 'sales@dealer.test' } });
+  const { leads, notes } = generateLeads(vehicles, Number(process.env.SEED_LEADS ?? 40), sales.id);
+  await prisma.lead.createMany({ data: leads, skipDuplicates: true });
+  await prisma.leadNote.createMany({ data: notes, skipDuplicates: true });
+  console.log(`Seeded ${leads.length} demo leads (idempotent).`);
 }
 
 main()

@@ -17,7 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
 import { VehicleStatus } from '@prisma/client';
-import { Roles } from '../common/decorators';
+import { AuthUser, CurrentUser, Roles } from '../common/decorators';
 import { PaginationQuery } from '../common/pagination';
 import { CreateVehicleDto, UpdateVehicleDto } from './dto';
 import { VehiclesService } from './vehicles.service';
@@ -55,23 +55,27 @@ export class VehiclesController {
   @Post()
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Create a vehicle (ADMIN)' })
-  create(@Body() dto: CreateVehicleDto) {
-    return this.vehicles.create(dto);
+  create(@Body() dto: CreateVehicleDto, @CurrentUser() user: AuthUser) {
+    return this.vehicles.create(dto, user.id);
   }
 
   @Patch(':id')
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Update a vehicle (ADMIN)' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateVehicleDto) {
-    return this.vehicles.update(id, dto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateVehicleDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.vehicles.update(id, dto, user.id);
   }
 
   @Delete(':id')
   @Roles('ADMIN')
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete a vehicle and its images (ADMIN)' })
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.vehicles.remove(id);
+  remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthUser) {
+    return this.vehicles.remove(id, user.id);
   }
 
   @Post(':id/images')
@@ -88,9 +92,13 @@ export class VehiclesController {
     },
   })
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_IMAGE_BYTES, files: 1 } }))
-  addImage(@Param('id', ParseUUIDPipe) id: string, @UploadedFile() file?: Express.Multer.File) {
+  addImage(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthUser,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
     if (!file) throw new BadRequestException('Multipart field "file" is required');
-    return this.vehicles.addImage(id, file);
+    return this.vehicles.addImage(id, file, user.id);
   }
 
   @Delete(':id/images/:imageId')
@@ -100,7 +108,8 @@ export class VehiclesController {
   removeImage(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('imageId', ParseUUIDPipe) imageId: string,
+    @CurrentUser() user: AuthUser,
   ) {
-    return this.vehicles.removeImage(id, imageId);
+    return this.vehicles.removeImage(id, imageId, user.id);
   }
 }

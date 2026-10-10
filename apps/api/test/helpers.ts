@@ -1,6 +1,6 @@
 import { Controller, Get, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Prisma, Role } from '@prisma/client';
+import { LeadStatus, Prisma, Role } from '@prisma/client';
 import * as argon2 from 'argon2';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
@@ -42,6 +42,9 @@ export async function createApp(opts: { swagger?: boolean } = {}): Promise<INest
 
 export async function resetDb(app: INestApplication): Promise<void> {
   const prisma = app.get(PrismaService);
+  await prisma.auditLog.deleteMany();
+  await prisma.leadNote.deleteMany();
+  await prisma.lead.deleteMany();
   await prisma.vehicle.deleteMany(); // images cascade
   await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany();
@@ -110,3 +113,21 @@ export const PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
   'base64',
 );
+
+export function createLead(
+  app: INestApplication,
+  vehicleId: string | null,
+  status: LeadStatus = 'NEW',
+  overrides: Partial<Prisma.LeadUncheckedCreateInput> = {},
+) {
+  return app.get(PrismaService).lead.create({
+    data: {
+      vehicleId,
+      status,
+      name: 'Max Mustermann',
+      email: 'max@example.com',
+      message: 'Is this car still available?',
+      ...overrides,
+    },
+  });
+}
