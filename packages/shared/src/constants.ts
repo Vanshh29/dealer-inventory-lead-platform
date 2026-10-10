@@ -12,3 +12,26 @@ export function formatEuro(cents: number): string {
   if (!Number.isInteger(cents)) throw new Error('Price must be integer cents');
   return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
 }
+
+export const FUEL_TYPES = [
+  'PETROL',
+  'DIESEL',
+  'ELECTRIC',
+  'HYBRID',
+  'PLUGIN_HYBRID',
+  'LPG',
+] as const;
+export type FuelType = (typeof FUEL_TYPES)[number];
+
+export const GEARBOXES = ['MANUAL', 'AUTOMATIC'] as const;
+export type Gearbox = (typeof GEARBOXES)[number];
+
+export const CATALOG_SORTS = [
+  'relevance',
+  'newest',
+  'price_asc',
+  'price_desc',
+  'year_desc',
+  'mileage_asc',
+] as const;
+export type CatalogSort = (typeof CATALOG_SORTS)[number];

@@ -98,3 +98,13 @@ Rules, concurrency handling, audit design and GDPR notes: `docs/decisions/0004-l
 | `AuditLog (entity, entityId, createdAt)` | history of one entity                            |
 | `AuditLog (actorId, createdAt)`          | what did this user do                            |
 | `AuditLog (createdAt)`                   | unfiltered newest-first list                     |
+
+## Web API client (Phase 4, part 1)
+
+```
+@dealer/shared  api-schemas.ts (zod)  ──infers──▶  TS types
+      │                                              │
+      ├── API contract tests parse real responses    └── web client validates at runtime
+```
+
+`apps/web/src/lib/api`: `http.ts` (request, errors, single-flight refresh), `client.ts` (typed endpoints), `errors.ts`, `index.ts` (`api`, `serverApi`, `assetUrl`). Rationale: `docs/decisions/0005-typed-api-client.md`.

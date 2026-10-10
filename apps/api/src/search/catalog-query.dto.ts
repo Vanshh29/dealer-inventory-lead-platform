@@ -1,17 +1,11 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 import { FuelType, Gearbox } from '@prisma/client';
+import { CATALOG_SORTS, CatalogSort } from '@dealer/shared';
 import { PaginationQuery } from '../common/pagination';
 
-export const CATALOG_SORTS = [
-  'relevance',
-  'newest',
-  'price_asc',
-  'price_desc',
-  'year_desc',
-  'mileage_asc',
-] as const;
-export type CatalogSort = (typeof CATALOG_SORTS)[number];
+export { CATALOG_SORTS };
+export type { CatalogSort };
 
 export class CatalogQuery extends PaginationQuery {
   /** Free-text search over make, model, variant, colour and description. */

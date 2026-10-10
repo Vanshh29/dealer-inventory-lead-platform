@@ -3,7 +3,7 @@
 Full-stack used-car dealer platform: public catalog, lead capture, and an admin back office.
 TypeScript end to end — Next.js, NestJS, PostgreSQL, Prisma (from Phase 1), Docker, GitHub Actions.
 
-> Status: **Phase 3 (leads pipeline) complete**.
+> Status: **Phase 4 in progress (typed API client done; UI next)**.
 
 ## Quick start (Docker)
 
