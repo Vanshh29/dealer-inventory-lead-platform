@@ -1,5 +1,5 @@
 FROM node:22-alpine AS build
-RUN corepack enable
+RUN apk add --no-cache openssl && corepack enable
 WORKDIR /repo
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
 COPY packages/shared/package.json packages/shared/
@@ -10,9 +10,10 @@ COPY apps/api apps/api
 RUN pnpm --filter @dealer/shared build && pnpm --filter @dealer/api build
 
 FROM node:22-alpine
-RUN corepack enable
-WORKDIR /repo
+RUN apk add --no-cache openssl
+WORKDIR /repo/apps/api
 ENV NODE_ENV=production
-COPY --from=build /repo ./
+COPY --from=build /repo /repo
 EXPOSE 4000
-CMD ["node", "apps/api/dist/main.js"]
+# Apply committed migrations, then start. Seeding is a separate, explicit step (see README).
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/main.js"]

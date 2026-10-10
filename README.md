@@ -3,7 +3,7 @@
 Full-stack used-car dealer platform: public catalog, lead capture, and an admin back office.
 TypeScript end to end — Next.js, NestJS, PostgreSQL, Prisma (from Phase 1), Docker, GitHub Actions.
 
-> Status: **Phase 0 (foundation)**.
+> Status: **Phase 1 (auth and RBAC) complete**.
 
 ## Quick start (Docker)
 
@@ -15,6 +15,12 @@ docker compose up --build
 - Web: http://localhost:3000
 - API health: http://localhost:4000/health
 
+The API applies migrations on start. Create the demo users (admin/sales/viewer `@dealer.test`, password `Passw0rd!Passw0rd!`, local use only):
+
+```bash
+docker compose exec api ./node_modules/.bin/tsx prisma/seed.ts
+```
+
 ## Local development
 
 Requires Node 22 and pnpm 9 (`corepack enable`).
@@ -22,6 +28,10 @@ Requires Node 22 and pnpm 9 (`corepack enable`).
 ```bash
 pnpm install
 pnpm --filter @dealer/shared build
+docker compose up -d db
+export DATABASE_URL='postgresql://dealer:dealer_dev_password@localhost:5432/dealer?schema=public'
+export JWT_ACCESS_SECRET='dev-only-change-me-dev-only-change-me'
+pnpm --filter @dealer/api db:migrate && pnpm --filter @dealer/api db:seed
 pnpm --filter @dealer/api start:dev   # API on :4000
 pnpm --filter @dealer/web dev         # Web on :3000
 ```
@@ -30,7 +40,10 @@ pnpm --filter @dealer/web dev         # Web on :3000
 
 ```bash
 pnpm lint && pnpm typecheck && pnpm test && pnpm build
+pnpm test:int   # integration tests; needs Postgres on localhost:5432 with a `dealer_test` database
 ```
+
+Create the test database once: `docker compose exec db psql -U dealer -d dealer -c 'CREATE DATABASE dealer_test'`.
 
 ## Layout
 

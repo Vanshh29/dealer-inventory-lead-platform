@@ -1,0 +1,14 @@
+import { INestApplication } from '@nestjs/common';
+import request from 'supertest';
+import { createApp } from './helpers';
+
+describe('GET /health', () => {
+  let app: INestApplication;
+  beforeAll(async () => (app = await createApp()));
+  afterAll(async () => app.close());
+
+  it('is public and returns ok', async () => {
+    const res = await request(app.getHttpServer()).get('/health').expect(200);
+    expect(res.body.status).toBe('ok');
+  });
+});

@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "test:int": "pnpm --filter @dealer/api test:int"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
