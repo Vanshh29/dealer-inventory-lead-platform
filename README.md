@@ -2,6 +2,8 @@
 
 A used-car dealer platform: a public catalog with full-text search, lead capture, and a role-based back office to work the lead pipeline. TypeScript end to end: Next.js, NestJS, PostgreSQL + Prisma, REST (OpenAPI) and a read-only GraphQL layer, Docker, GitHub Actions.
 
+![Home page](docs/screenshots/home.png)
+
 ![Catalog with filters](docs/screenshots/catalog.png)
 
 | Vehicle page and enquiry form                          | Back office leads table                          |

@@ -45,7 +45,7 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" aria-labelledby={`${uid}-t`}>
-      <h1 id={`${uid}-t`} className="text-2xl font-bold">
+      <h1 id={`${uid}-t`} className="text-3xl font-bold tracking-tight">
         Staff login
       </h1>
       {error && (

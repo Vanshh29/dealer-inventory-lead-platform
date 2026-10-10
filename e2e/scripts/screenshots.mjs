@@ -15,6 +15,9 @@ const shot = async (name, full = false) => {
   console.log('saved', name);
 };
 
+await page.goto(`${base}/`);
+await shot('home', true);
+
 await page.goto(`${base}/vehicles?make=Volkswagen&fuel=DIESEL&sort=price_asc`);
 await shot('catalog');
 
@@ -23,6 +26,7 @@ await page.waitForURL(/\/vehicles\/[0-9a-f-]{36}/);
 await shot('vehicle-detail', true);
 
 await page.goto(`${base}/admin/login`);
+await shot('login');
 await page.getByLabel(/email/i).fill('sales@dealer.test');
 await page.getByLabel(/password/i).fill('Passw0rd!Passw0rd!');
 await page.getByRole('button', { name: /sign in|log in/i }).click();

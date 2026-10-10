@@ -1,14 +1,17 @@
 import Link from 'next/link';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { InboxIcon } from './icons';
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-50';
+  'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50';
 const variants: Record<Variant, string> = {
-  primary: 'bg-blue-700 text-white hover:bg-blue-800',
-  secondary: 'border border-slate-300 bg-white text-slate-900 hover:bg-slate-50',
-  danger: 'bg-red-700 text-white hover:bg-red-800',
+  primary:
+    'bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-sm shadow-blue-900/20 hover:from-blue-700 hover:to-blue-800 hover:shadow-md',
+  secondary:
+    'border border-slate-300 bg-white text-slate-900 shadow-sm hover:border-slate-400 hover:bg-slate-50',
+  danger: 'bg-red-700 text-white shadow-sm hover:bg-red-800',
   ghost: 'text-slate-700 hover:bg-slate-100',
 };
 
@@ -40,7 +43,7 @@ export function LinkButton({
 }
 
 export const inputClass =
-  'block w-full rounded-md border border-slate-400 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-700 disabled:bg-slate-100';
+  'block w-full rounded-lg border border-slate-400 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition placeholder:text-slate-500 hover:border-slate-500 focus-visible:border-blue-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-700 disabled:bg-slate-100';
 
 /** Label + control + error text, wired together with ids for screen readers. */
 export function Field({
@@ -86,19 +89,19 @@ export function Field({
 }
 
 const badgeTones = {
-  slate: 'bg-slate-100 text-slate-800',
-  blue: 'bg-blue-100 text-blue-900',
-  amber: 'bg-amber-100 text-amber-900',
-  green: 'bg-green-100 text-green-900',
-  red: 'bg-red-100 text-red-900',
-  violet: 'bg-violet-100 text-violet-900',
+  slate: 'bg-slate-100 text-slate-800 ring-slate-300/70',
+  blue: 'bg-blue-50 text-blue-900 ring-blue-300/70',
+  amber: 'bg-amber-50 text-amber-900 ring-amber-300/70',
+  green: 'bg-green-50 text-green-900 ring-green-300/70',
+  red: 'bg-red-50 text-red-900 ring-red-300/70',
+  violet: 'bg-violet-50 text-violet-900 ring-violet-300/70',
 } as const;
 export type Tone = keyof typeof badgeTones;
 
 export function Badge({ tone = 'slate', children }: { tone?: Tone; children: ReactNode }) {
   return (
     <span
-      className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeTones[tone]}`}
+      className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${badgeTones[tone]}`}
     >
       {children}
     </span>
@@ -119,7 +122,13 @@ export function Spinner({ label = 'Loading…' }: { label?: string }) {
 
 export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   return (
-    <div className="rounded-lg border border-dashed border-slate-300 px-6 py-12 text-center">
+    <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-14 text-center">
+      <span
+        aria-hidden="true"
+        className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-700"
+      >
+        <InboxIcon className="h-6 w-6" />
+      </span>
       <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
       {children && <div className="mt-2 text-slate-600">{children}</div>}
     </div>
@@ -128,7 +137,7 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
 
 export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-6 py-6">
+    <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-6 py-6 shadow-sm">
       <p className="font-medium text-red-900">{message}</p>
       {onRetry && (
         <Button variant="secondary" className="mt-3" onClick={onRetry}>
@@ -153,7 +162,8 @@ export function Pagination({
 }) {
   const pages = Math.max(1, Math.ceil(total / limit));
   if (pages <= 1) return null;
-  const linkClass = 'rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50';
+  const linkClass =
+    'rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm transition hover:border-slate-400 hover:bg-slate-50';
   return (
     <nav aria-label="Pagination" className="mt-8 flex items-center justify-between gap-4">
       {page > 1 ? (

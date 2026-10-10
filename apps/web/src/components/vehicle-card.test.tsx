@@ -18,7 +18,7 @@ describe('VehicleCard', () => {
     );
   });
 
-  it('uses the API origin for uploaded images and leaves absolute URLs alone', () => {
+  it('uses the API origin for uploaded images, leaves absolute URLs alone and draws a car for placeholders', () => {
     const { rerender } = render(
       <ul>
         <VehicleCard vehicle={vehicle()} />
@@ -33,13 +33,31 @@ describe('VehicleCard', () => {
         <VehicleCard
           vehicle={vehicle({
             images: [
-              { id: 'x', vehicleId: 'v', key: 'k', url: 'https://placehold.co/1.png', position: 0 },
+              {
+                id: 'x',
+                vehicleId: 'v',
+                key: 'k',
+                url: 'https://cdn.example.com/1.png',
+                position: 0,
+              },
             ],
           })}
         />
       </ul>,
     );
-    expect(screen.getByRole('img')).toHaveAttribute('src', 'https://placehold.co/1.png');
+    expect(screen.getByRole('img')).toHaveAttribute('src', 'https://cdn.example.com/1.png');
+    rerender(
+      <ul>
+        <VehicleCard
+          vehicle={vehicle({
+            images: [
+              { id: 'y', vehicleId: 'v', key: 'k', url: 'https://placehold.co/2.png', position: 0 },
+            ],
+          })}
+        />
+      </ul>,
+    );
+    expect(screen.getByRole('img').tagName).toBe('svg');
   });
 
   it('has a text fallback when there are no photos and describes images with alt text', () => {

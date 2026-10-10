@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 import { useSession } from '@/lib/session';
+import { CarIcon, GridIcon, InboxIcon } from './icons';
 import { Badge, Button, ErrorState, Spinner } from './ui';
 
 const NAV = [
-  { href: '/admin', label: 'Dashboard', exact: true },
-  { href: '/admin/leads', label: 'Leads' },
-  { href: '/admin/vehicles', label: 'Vehicles' },
+  { href: '/admin', label: 'Dashboard', exact: true, icon: GridIcon },
+  { href: '/admin/leads', label: 'Leads', icon: InboxIcon },
+  { href: '/admin/vehicles', label: 'Vehicles', icon: CarIcon },
 ];
 
 /**
@@ -40,37 +41,54 @@ export function ConsoleShell({ children }: { children: ReactNode }) {
 
   const { user } = session;
   return (
-    <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
-        <nav aria-label="Back office" className="flex gap-1">
-          {NAV.map((item) => {
-            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+    <div className="gap-8 md:grid md:grid-cols-[13.5rem_1fr]">
+      <aside className="mb-6 md:sticky md:top-24 md:mb-0 md:self-start">
+        <nav
+          aria-label="Back office"
+          className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-card md:flex-col"
+        >
+          {NAV.map(({ href, label, exact, icon: Icon }) => {
+            const active = exact ? pathname === href : pathname.startsWith(href);
             return (
               <Link
-                key={item.href}
-                href={item.href}
+                key={href}
+                href={href}
                 aria-current={active ? 'page' : undefined}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium ${active ? 'bg-blue-100 text-blue-900' : 'text-slate-700 hover:bg-slate-100'}`}
+                className={`flex items-center gap-2.5 whitespace-nowrap rounded-xl px-3.5 py-2.5 text-sm font-semibold transition ${active ? 'bg-gradient-to-r from-blue-700 to-blue-600 text-white shadow-md shadow-blue-900/20' : 'text-slate-700 hover:bg-slate-100'}`}
               >
-                {item.label}
+                <Icon className="h-[1.1rem] w-[1.1rem]" />
+                {label}
               </Link>
             );
           })}
         </nav>
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-slate-700">{user.email}</span>
-          <Badge tone={user.role === 'ADMIN' ? 'violet' : user.role === 'SALES' ? 'blue' : 'slate'}>
-            {user.role}
-          </Badge>
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
+          <div className="flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-sm font-bold uppercase text-white"
+            >
+              {user.email.slice(0, 2)}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-slate-900">{user.email}</p>
+              <Badge
+                tone={user.role === 'ADMIN' ? 'violet' : user.role === 'SALES' ? 'blue' : 'slate'}
+              >
+                {user.role}
+              </Badge>
+            </div>
+          </div>
           <Button
             variant="secondary"
+            className="mt-4 w-full"
             onClick={() => void logout().then(() => router.replace('/admin/login'))}
           >
             Log out
           </Button>
         </div>
-      </div>
-      {children}
+      </aside>
+      <div className="min-w-0">{children}</div>
     </div>
   );
 }

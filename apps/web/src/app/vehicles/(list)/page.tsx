@@ -25,7 +25,7 @@ export default async function CatalogPage({
     <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
       <aside
         aria-label="Filters"
-        className="rounded-lg border border-slate-200 bg-white p-4 lg:self-start"
+        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card lg:sticky lg:top-24 lg:self-start"
       >
         <CatalogFilters
           facets={facets.status === 'fulfilled' ? facets.value : null}
@@ -34,7 +34,7 @@ export default async function CatalogPage({
       </aside>
 
       <section aria-labelledby="catalog-title">
-        <h1 id="catalog-title" className="text-2xl font-bold">
+        <h1 id="catalog-title" className="text-3xl font-bold tracking-tight">
           Cars
         </h1>
 
@@ -51,7 +51,7 @@ export default async function CatalogPage({
 
         {result.status === 'fulfilled' && (
           <>
-            <p className="mt-1 text-sm text-slate-700" aria-live="polite">
+            <p className="mt-1 text-slate-700" aria-live="polite">
               {result.value.total} {result.value.total === 1 ? 'car' : 'cars'} found
             </p>
             {result.value.items.length === 0 ? (

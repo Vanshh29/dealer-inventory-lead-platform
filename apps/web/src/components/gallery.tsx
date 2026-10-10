@@ -2,14 +2,23 @@
 
 import { useState, type KeyboardEvent } from 'react';
 import type { VehicleImage } from '@dealer/shared';
-import { assetUrl } from '@/lib/api';
+import { ChevronLeftIcon, ChevronRightIcon } from './icons';
+import { VehiclePhoto } from './vehicle-photo';
 
-export function Gallery({ images, title }: { images: VehicleImage[]; title: string }) {
+export function Gallery({
+  images,
+  title,
+  vehicle,
+}: {
+  images: VehicleImage[];
+  title: string;
+  vehicle: { id: string; color: string | null };
+}) {
   const [index, setIndex] = useState(0);
 
   if (images.length === 0) {
     return (
-      <div className="flex aspect-[4/3] items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+      <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-slate-100 text-slate-600">
         No photos yet
       </div>
     );
@@ -28,29 +37,37 @@ export function Gallery({ images, title }: { images: VehicleImage[]; title: stri
       aria-label={`Photos of ${title}`}
       onKeyDown={onKeyDown}
     >
-      <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-slate-100">
-        <img
-          src={assetUrl(current.url)}
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100 shadow-card">
+        <VehiclePhoto
+          image={current}
+          vehicle={vehicle}
           alt={`${title}, photo ${index + 1} of ${images.length}`}
-          className="h-full w-full object-cover"
         />
+        {images.length > 1 && (
+          <span
+            aria-hidden="true"
+            className="absolute bottom-3 right-3 rounded-full bg-slate-900/70 px-2.5 py-1 text-xs font-medium text-white"
+          >
+            {index + 1} / {images.length}
+          </span>
+        )}
         {images.length > 1 && (
           <>
             <button
               type="button"
               onClick={() => go(index - 1)}
               aria-label="Previous photo"
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 px-3 py-2 text-lg shadow hover:bg-white focus-visible:outline-2 focus-visible:outline-blue-700"
+              className="absolute left-2 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-slate-800 shadow-md transition hover:scale-110 hover:bg-white focus-visible:outline-2 focus-visible:outline-blue-700"
             >
-              ←
+              <ChevronLeftIcon className="h-5 w-5" />
             </button>
             <button
               type="button"
               onClick={() => go(index + 1)}
               aria-label="Next photo"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 px-3 py-2 text-lg shadow hover:bg-white focus-visible:outline-2 focus-visible:outline-blue-700"
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-slate-800 shadow-md transition hover:scale-110 hover:bg-white focus-visible:outline-2 focus-visible:outline-blue-700"
             >
-              →
+              <ChevronRightIcon className="h-5 w-5" />
             </button>
           </>
         )}
@@ -64,10 +81,11 @@ export function Gallery({ images, title }: { images: VehicleImage[]; title: stri
                 onClick={() => go(i)}
                 aria-label={`Show photo ${i + 1}`}
                 aria-current={i === index ? 'true' : undefined}
-                className={`block w-full overflow-hidden rounded-md border-2 focus-visible:outline-2 focus-visible:outline-blue-700 ${i === index ? 'border-blue-700' : 'border-transparent'}`}
+                className={`block w-full overflow-hidden rounded-lg border-2 transition focus-visible:outline-2 focus-visible:outline-blue-700 ${i === index ? 'border-blue-700 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
               >
-                <img
-                  src={assetUrl(img.url)}
+                <VehiclePhoto
+                  image={img}
+                  vehicle={vehicle}
                   alt=""
                   loading="lazy"
                   className="aspect-[4/3] w-full object-cover"

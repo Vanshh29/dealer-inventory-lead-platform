@@ -6,6 +6,14 @@ import { vehicleRevalidate } from '@/lib/cache';
 import { formatEuro, formatKm, FUEL_LABEL, GEARBOX_LABEL, vehicleTitle } from '@/lib/format';
 import { Gallery } from '@/components/gallery';
 import { LeadForm } from '@/components/lead-form';
+import {
+  CalendarIcon,
+  GaugeIcon,
+  FuelIcon,
+  GearIcon,
+  PaletteIcon,
+  ChevronLeftIcon,
+} from '@/components/icons';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -34,28 +42,30 @@ export async function generateMetadata({
 export default async function VehiclePage({ params }: { params: Promise<{ id: string }> }) {
   const v = await load((await params).id);
   const title = vehicleTitle(v);
-  const specs: [string, string][] = [
-    ['Year', String(v.year)],
-    ['Mileage', formatKm(v.mileage)],
-    ['Fuel', FUEL_LABEL[v.fuel]],
-    ['Gearbox', GEARBOX_LABEL[v.gearbox]],
-    ['Colour', v.color],
-    ['VIN', v.vin],
+  const specs = [
+    { label: 'Year', value: String(v.year), icon: CalendarIcon },
+    { label: 'Mileage', value: formatKm(v.mileage), icon: GaugeIcon },
+    { label: 'Fuel', value: FUEL_LABEL[v.fuel], icon: FuelIcon },
+    { label: 'Gearbox', value: GEARBOX_LABEL[v.gearbox], icon: GearIcon },
+    { label: 'Colour', value: v.color, icon: PaletteIcon },
   ];
 
   return (
     <article>
-      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-slate-700">
-        <Link href="/vehicles" className="hover:underline">
-          ← All cars
+      <nav aria-label="Breadcrumb" className="mb-5 text-sm font-medium text-slate-700">
+        <Link href="/vehicles" className="inline-flex items-center gap-1 hover:text-blue-800">
+          <ChevronLeftIcon className="h-4 w-4" /> All cars
         </Link>
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div>
-          <Gallery images={v.images} title={title} />
+          <Gallery images={v.images} title={title} vehicle={v} />
           {v.description && (
-            <section aria-labelledby="desc-title" className="mt-8">
+            <section
+              aria-labelledby="desc-title"
+              className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-card"
+            >
               <h2 id="desc-title" className="text-lg font-semibold">
                 Description
               </h2>
@@ -64,30 +74,41 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
           )}
         </div>
 
-        <div className="space-y-6">
-          <header>
-            <h1 className="text-2xl font-bold">{title}</h1>
-            <p className="mt-2 text-3xl font-bold text-blue-800">{formatEuro(v.priceCents)}</p>
+        <div className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+          <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+            <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+            <p className="mt-3 text-4xl font-extrabold tracking-tight text-blue-800">
+              {formatEuro(v.priceCents)}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">Final price, including VAT</p>
           </header>
 
-          <section
-            aria-labelledby="specs-title"
-            className="rounded-lg border border-slate-200 bg-white p-4"
-          >
+          <section aria-labelledby="specs-title">
             <h2 id="specs-title" className="sr-only">
               Specifications
             </h2>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              {specs.map(([k, val]) => (
-                <div key={k} className="contents">
-                  <dt className="text-slate-600">{k}</dt>
-                  <dd className="break-all font-medium text-slate-900">{val}</dd>
+            <dl className="grid grid-cols-2 gap-3">
+              {specs.map(({ label, value, icon: Icon }) => (
+                <div
+                  key={label}
+                  className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm"
+                >
+                  <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-600">
+                    <Icon className="h-4 w-4 text-blue-700" /> {label}
+                  </dt>
+                  <dd className="mt-1 font-semibold text-slate-900">{value}</dd>
                 </div>
               ))}
+              <div className="col-span-2 rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-600">VIN</dt>
+                <dd className="mt-1 break-all font-mono text-sm font-medium text-slate-900">
+                  {v.vin}
+                </dd>
+              </div>
             </dl>
           </section>
 
-          <section className="rounded-lg border border-slate-200 bg-white p-4">
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
             <LeadForm vehicleId={v.id} vehicleTitle={title} />
           </section>
         </div>

@@ -45,7 +45,7 @@ test.describe('accessibility (axe)', () => {
     page,
   }) => {
     await page.goto('/vehicles?q=golf');
-    await page.getByRole('list').getByRole('link').first().click();
+    await page.locator('main ul a[href^="/vehicles/"]').first().click();
     await page.getByRole('heading', { level: 1 }).waitFor();
     expect(await violations(page), 'detail').toEqual([]);
 

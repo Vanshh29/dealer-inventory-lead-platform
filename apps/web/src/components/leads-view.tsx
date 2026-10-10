@@ -14,31 +14,31 @@ export const LEADS_PAGE_SIZE = 20;
 
 export function LeadsTable({ items }: { items: Lead[] }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-card">
       <table className="w-full text-left text-sm">
         <caption className="sr-only">Leads, newest first</caption>
-        <thead className="bg-slate-50 text-slate-700">
+        <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-700">
           <tr>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-4 py-3.5 font-semibold">
               Received
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-4 py-3.5 font-semibold">
               Customer
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-4 py-3.5 font-semibold">
               Vehicle
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-4 py-3.5 font-semibold">
               Status
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-4 py-3.5 font-semibold">
               Assigned to
             </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
           {items.map((lead) => (
-            <tr key={lead.id} className="hover:bg-slate-50">
+            <tr key={lead.id} className="transition-colors hover:bg-blue-50/50">
               <td className="whitespace-nowrap px-4 py-3 text-slate-700">
                 {formatDate(lead.createdAt)}
               </td>
@@ -98,7 +98,7 @@ export function LeadsView() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-bold">Leads</h1>
+      <h1 className="text-3xl font-bold tracking-tight">Leads</h1>
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <nav aria-label="Filter by status" className="flex flex-wrap gap-1.5">
@@ -109,7 +109,7 @@ export function LeadsView() {
                 key={s ?? 'all'}
                 href={hrefFor(s, q)}
                 aria-current={active ? 'true' : undefined}
-                className={`rounded-full border px-3 py-1 text-sm ${active ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-800 hover:bg-slate-50'}`}
+                className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${active ? 'border-blue-700 bg-blue-700 text-white shadow-md shadow-blue-900/20' : 'border-slate-300 bg-white text-slate-800 hover:border-slate-400 hover:bg-slate-50'}`}
               >
                 {s ? LEAD_STATUS_LABEL[s] : 'All'}
               </Link>

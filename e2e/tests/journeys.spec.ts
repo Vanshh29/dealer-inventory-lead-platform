@@ -19,7 +19,7 @@ test.afterAll(async () => {
 test.describe('public site', () => {
   test('browse, search and filter the catalog', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1, name: 'Find your next car' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /Find the used car/ })).toBeVisible();
 
     await page.getByRole('searchbox', { name: 'Search cars' }).fill('golf');
     await page.getByRole('button', { name: 'Search' }).click();
@@ -52,14 +52,14 @@ test.describe('public site', () => {
 
   test('vehicle detail with gallery, and 404 for unknown cars', async ({ page, watch }) => {
     await page.goto('/vehicles?q=golf'); // seeded cars have three photos each
-    await page.getByRole('list').getByRole('link').first().click();
+    await page.locator('main ul a[href^="/vehicles/"]').first().click();
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.getByText(/€/).first()).toBeVisible();
 
     const gallery = page.getByRole('region', { name: /Photos of/ });
-    await expect(gallery.getByRole('img').first()).toHaveAttribute('alt', /photo 1 of 3/);
+    await expect(gallery.getByRole('img', { name: /photo 1 of 3/ })).toBeVisible();
     await gallery.getByRole('button', { name: 'Next photo' }).click();
-    await expect(gallery.getByRole('img').first()).toHaveAttribute('alt', /photo 2 of 3/);
+    await expect(gallery.getByRole('img', { name: /photo 2 of 3/ })).toBeVisible();
 
     watch.allow(/^404 GET .*\/vehicles\/00000000-0000-4000-8000-000000000000$/); // provoked on purpose
     const res = await page.goto('/vehicles/00000000-0000-4000-8000-000000000000');
@@ -69,7 +69,7 @@ test.describe('public site', () => {
 
   test('submit a lead: validation first, then success', async ({ page }) => {
     await page.goto('/vehicles?q=golf');
-    await page.getByRole('list').getByRole('link').first().click();
+    await page.locator('main ul a[href^="/vehicles/"]').first().click();
 
     const form = page.getByRole('form', { name: /Interested/ });
     await form.getByRole('button', { name: 'Send request' }).click();
