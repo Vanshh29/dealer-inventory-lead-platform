@@ -4,7 +4,7 @@ import { LeadStatus, Prisma, Role } from '@prisma/client';
 import * as argon2 from 'argon2';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { Roles } from '../src/common/decorators';
+import { Public, Roles } from '../src/common/decorators';
 import { PrismaService } from '../src/common/prisma.service';
 import { configureApp } from '../src/setup';
 import { setupSwagger } from '../src/swagger';
@@ -16,6 +16,9 @@ export const PASSWORD = 'Sup3r-secret-pass!';
 class RbacProbeController {
   @Get('any-authenticated') any() {
     return { ok: true };
+  }
+  @Public() @Get('boom') boom(): never {
+    throw new Error('secret internals: postgres://user:pw@host');
   }
   @Get('admin') @Roles('ADMIN') admin() {
     return { ok: true };

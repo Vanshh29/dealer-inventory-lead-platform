@@ -15,6 +15,7 @@ describe('OpenAPI', () => {
 
   const expected: [string, string][] = [
     ['/health', 'get'],
+    ['/health/ready', 'get'],
     ['/auth/login', 'post'],
     ['/auth/refresh', 'post'],
     ['/auth/logout', 'post'],

@@ -1,4 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from '@nestjs/common';
+import * as Sentry from '@sentry/node';
 import { Response } from 'express';
 
 /** Every error leaves the API as { statusCode, error, message, details? }. */
@@ -10,6 +11,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // GraphQL has its own error format; hand the exception to Apollo (unexpected ones are logged).
     if (host.getType<string>() === 'graphql') {
       if (!(exception instanceof HttpException)) {
+        Sentry.captureException(exception);
         this.logger.error(exception instanceof Error ? exception.stack : String(exception));
       }
       return exception;
@@ -32,6 +34,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     this.logger.error(exception instanceof Error ? exception.stack : String(exception));
+    Sentry.captureException(exception); // no-op unless Sentry was initialised
     res.status(500).json({
       statusCode: 500,
       error: 'InternalServerError',
