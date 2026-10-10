@@ -6,7 +6,14 @@ import { Response } from 'express';
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
-  catch(exception: unknown, host: ArgumentsHost): void {
+  catch(exception: unknown, host: ArgumentsHost): unknown {
+    // GraphQL has its own error format; hand the exception to Apollo (unexpected ones are logged).
+    if (host.getType<string>() === 'graphql') {
+      if (!(exception instanceof HttpException)) {
+        this.logger.error(exception instanceof Error ? exception.stack : String(exception));
+      }
+      return exception;
+    }
     const res = host.switchToHttp().getResponse<Response>();
 
     if (exception instanceof HttpException) {

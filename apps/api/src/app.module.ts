@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AuditModule } from './audit/audit.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './common/jwt-auth.guard';
 import { PrismaModule } from './common/prisma.module';
 import { RolesGuard } from './common/roles.guard';
 import { validateEnv } from './common/env';
+import { AppThrottlerGuard } from './graphql/gql-throttler.guard';
+import { CatalogGraphqlModule } from './graphql/graphql-api.module';
 import { HealthController } from './health/health.controller';
 import { LeadsModule } from './leads/leads.module';
 import { SearchModule } from './search/search.module';
@@ -26,6 +28,7 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     AuditModule,
     VehiclesModule,
     SearchModule,
+    CatalogGraphqlModule,
     LeadsModule,
     StatsModule,
     UsersModule,
@@ -34,7 +37,7 @@ import { VehiclesModule } from './vehicles/vehicles.module';
   controllers: [HealthController],
   providers: [
     // Order matters: throttle -> authenticate -> authorize.
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: AppThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
