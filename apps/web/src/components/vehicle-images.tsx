@@ -66,10 +66,7 @@ export function VehicleImages({
   }
 
   return (
-    <section
-      aria-labelledby={`${inputId}-h`}
-      className="rounded-lg border border-slate-200 bg-white p-4"
-    >
+    <section aria-labelledby={`${inputId}-h`} className="glass rounded-2xl p-4">
       <h2 id={`${inputId}-h`} className="text-lg font-semibold">
         Photos ({vehicle.images.length}/{MAX_IMAGES})
       </h2>

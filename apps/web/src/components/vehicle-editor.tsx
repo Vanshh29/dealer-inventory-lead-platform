@@ -55,10 +55,7 @@ export function VehicleEditor({ id }: { id: string }) {
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        <section
-          aria-label="Vehicle details"
-          className="rounded-lg border border-slate-200 bg-white p-4"
-        >
+        <section aria-label="Vehicle details" className="glass rounded-2xl p-4">
           <VehicleForm vehicle={v} readOnly={!canEdit} onSaved={vehicle.reload} />
         </section>
         <div className="space-y-6">
@@ -66,7 +63,7 @@ export function VehicleEditor({ id }: { id: string }) {
           {canEdit && (
             <section
               aria-labelledby="danger-h"
-              className="rounded-lg border border-red-200 bg-white p-4"
+              className="rounded-2xl border border-red-200 bg-white/80 p-4 backdrop-blur"
             >
               <h2 id="danger-h" className="text-lg font-semibold text-red-900">
                 Danger zone
@@ -99,7 +96,7 @@ export function NewVehicle() {
       <p className="text-sm text-slate-700">
         Save the vehicle first, then add photos on the next screen.
       </p>
-      <div className="rounded-lg border border-slate-200 bg-white p-4">
+      <div className="glass rounded-2xl p-4">
         <VehicleForm />
       </div>
     </div>

@@ -59,7 +59,7 @@ function Notes({ leadId, canAdd }: { leadId: string; canAdd: boolean }) {
   }
 
   return (
-    <section aria-labelledby="notes-h" className="rounded-lg border border-slate-200 bg-white p-4">
+    <section aria-labelledby="notes-h" className="glass rounded-2xl p-4">
       <h2 id="notes-h" className="text-lg font-semibold">
         Notes ({total})
       </h2>
@@ -140,7 +140,7 @@ function History({ leadId, users, version }: { leadId: string; users: User[]; ve
   const who = (id: string | null) =>
     id ? (users.find((u) => u.id === id)?.email ?? 'a user') : 'the system';
   return (
-    <section aria-labelledby="hist-h" className="rounded-lg border border-slate-200 bg-white p-4">
+    <section aria-labelledby="hist-h" className="glass rounded-2xl p-4">
       <h2 id="hist-h" className="text-lg font-semibold">
         History
       </h2>
@@ -216,10 +216,7 @@ export function LeadDetail({ id }: { id: string }) {
 
       <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
         <div className="space-y-6">
-          <section
-            aria-labelledby="enq-h"
-            className="rounded-lg border border-slate-200 bg-white p-4"
-          >
+          <section aria-labelledby="enq-h" className="glass rounded-2xl p-4">
             <h2 id="enq-h" className="text-lg font-semibold">
               Enquiry
             </h2>
@@ -269,10 +266,7 @@ export function LeadDetail({ id }: { id: string }) {
         </div>
 
         <div className="space-y-6">
-          <section
-            aria-labelledby="st-h"
-            className="rounded-lg border border-slate-200 bg-white p-4"
-          >
+          <section aria-labelledby="st-h" className="glass rounded-2xl p-4">
             <h2 id="st-h" className="mb-3 text-lg font-semibold">
               Status
             </h2>
@@ -284,10 +278,7 @@ export function LeadDetail({ id }: { id: string }) {
             />
           </section>
 
-          <section
-            aria-labelledby="as-h"
-            className="rounded-lg border border-slate-200 bg-white p-4 text-sm"
-          >
+          <section aria-labelledby="as-h" className="glass rounded-2xl p-4 text-sm">
             <h2 id="as-h" className="mb-3 text-lg font-semibold">
               Assigned to
             </h2>

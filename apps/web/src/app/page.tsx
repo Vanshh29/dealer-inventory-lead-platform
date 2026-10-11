@@ -48,19 +48,19 @@ export default async function HomePage() {
     <div className="space-y-16">
       <section
         aria-labelledby="hero-title"
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-blue-950 to-blue-800 px-6 py-14 text-white shadow-lift sm:px-12 sm:py-20"
+        className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#0b1030,#1e1b6b_45%,#1d4ed8_100%)] px-6 py-14 text-white shadow-lift sm:px-12 sm:py-20"
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-blue-500/30 blur-3xl"
+          className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 animate-float rounded-full bg-sky-500/40 blur-3xl"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-32 left-1/3 h-80 w-80 rounded-full bg-indigo-500/20 blur-3xl"
+          className="pointer-events-none absolute -bottom-32 left-1/3 h-80 w-80 animate-float-slow rounded-full bg-fuchsia-500/30 blur-3xl"
         />
         <div className="relative grid items-center gap-10 lg:grid-cols-[1.15fr_1fr]">
           <div className="animate-rise">
-            <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-blue-100 ring-1 ring-white/20">
+            <p className="glass-dark inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium text-blue-50">
               <BoltIcon className="h-4 w-4" /> New arrivals every week
             </p>
             <h1
@@ -68,9 +68,7 @@ export default async function HomePage() {
               className="mt-5 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl"
             >
               Find the used car
-              <span className="block bg-gradient-to-r from-sky-300 to-blue-200 bg-clip-text text-transparent">
-                that fits your life.
-              </span>
+              <span className="text-gradient animate-gradient block">that fits your life.</span>
             </h1>
             <p className="mt-4 max-w-lg text-lg text-blue-100">
               Inspected cars with transparent prices. Search by make, model, fuel or any keyword.
@@ -79,7 +77,7 @@ export default async function HomePage() {
               action="/vehicles"
               method="get"
               role="search"
-              className="mt-8 flex max-w-xl gap-2 rounded-2xl bg-white p-2 shadow-lift"
+              className="glass-strong mt-8 flex max-w-xl gap-2 rounded-2xl p-2 shadow-lift transition focus-within:shadow-glow"
             >
               <label htmlFor="home-q" className="sr-only">
                 Search cars
@@ -96,7 +94,7 @@ export default async function HomePage() {
               />
               <button
                 type="submit"
-                className="rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:from-blue-700 hover:to-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="rounded-xl bg-brand bg-[length:140%_100%] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-right hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 Search
               </button>
@@ -106,7 +104,7 @@ export default async function HomePage() {
                 <li key={l.label}>
                   <Link
                     href={l.href}
-                    className="inline-block rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white ring-1 ring-white/25 transition hover:bg-white hover:text-blue-900"
+                    className="glass-dark inline-block rounded-full px-3.5 py-1.5 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-white hover:text-indigo-900"
                   >
                     {l.label}
                   </Link>
@@ -116,7 +114,7 @@ export default async function HomePage() {
           </div>
           <div
             aria-hidden="true"
-            className="relative hidden animate-rise overflow-hidden rounded-3xl bg-white/10 p-3 ring-1 ring-white/20 backdrop-blur lg:block"
+            className="glass-dark relative hidden animate-float overflow-hidden rounded-3xl p-3 shadow-2xl shadow-indigo-950/50 lg:block"
           >
             <div className="aspect-[4/3] overflow-hidden rounded-2xl">
               <CarArt seed="hero" colour="blue" label="" />
@@ -127,12 +125,13 @@ export default async function HomePage() {
 
       <section aria-label="Why buy from us">
         <ul className="grid gap-4 sm:grid-cols-3">
-          {PROMISES.map(({ icon: Icon, title, text }) => (
+          {PROMISES.map(({ icon: Icon, title, text }, i) => (
             <li
               key={title}
-              className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-card"
+              style={{ animationDelay: `${i * 90}ms` }}
+              className="glass hover-lift reveal flex gap-4 rounded-2xl p-5"
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-glow">
                 <Icon className="h-6 w-6" />
               </span>
               <div>
@@ -154,7 +153,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/vehicles"
-            className="inline-flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-blue-800 hover:underline"
+            className="inline-flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-indigo-700 hover:underline"
           >
             Browse all cars <ArrowIcon className="h-4 w-4" />
           </Link>
@@ -166,9 +165,9 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section className="rounded-3xl bg-gradient-to-r from-blue-700 to-indigo-700 px-6 py-10 text-center text-white shadow-lift sm:py-12">
+      <section className="relative overflow-hidden rounded-3xl bg-brand bg-[length:200%_100%] animate-gradient px-6 py-10 text-center text-white shadow-lift sm:py-12">
         <h2 className="text-2xl font-bold">Not sure which car suits you?</h2>
-        <p className="mx-auto mt-2 max-w-md text-blue-100">
+        <p className="mx-auto mt-2 max-w-md text-white/95">
           Browse the full catalog and filter by price, year, mileage, fuel and gearbox.
         </p>
         <div className="mt-6 flex justify-center">

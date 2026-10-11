@@ -45,7 +45,7 @@ export function ConsoleShell({ children }: { children: ReactNode }) {
       <aside className="mb-6 md:sticky md:top-24 md:mb-0 md:self-start">
         <nav
           aria-label="Back office"
-          className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-card md:flex-col"
+          className="flex gap-1 overflow-x-auto glass-strong rounded-2xl p-2 md:flex-col"
         >
           {NAV.map(({ href, label, exact, icon: Icon }) => {
             const active = exact ? pathname === href : pathname.startsWith(href);
@@ -54,7 +54,7 @@ export function ConsoleShell({ children }: { children: ReactNode }) {
                 key={href}
                 href={href}
                 aria-current={active ? 'page' : undefined}
-                className={`flex items-center gap-2.5 whitespace-nowrap rounded-xl px-3.5 py-2.5 text-sm font-semibold transition ${active ? 'bg-gradient-to-r from-blue-700 to-blue-600 text-white shadow-md shadow-blue-900/20' : 'text-slate-700 hover:bg-slate-100'}`}
+                className={`flex items-center gap-2.5 whitespace-nowrap rounded-xl px-3.5 py-2.5 text-sm font-semibold transition duration-200 ${active ? 'bg-brand text-white shadow-md shadow-indigo-900/30' : 'text-slate-700 hover:translate-x-0.5 hover:bg-white/80 hover:text-indigo-700'}`}
               >
                 <Icon className="h-[1.1rem] w-[1.1rem]" />
                 {label}
@@ -62,11 +62,11 @@ export function ConsoleShell({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
-        <div className="mt-3 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-card md:mt-4 md:block md:p-4">
+        <div className="glass mt-3 flex items-center gap-3 rounded-2xl p-3 md:mt-4 md:block md:p-4">
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <span
               aria-hidden="true"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-sm font-bold uppercase text-white"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold uppercase text-white shadow-glow"
             >
               {user.email.slice(0, 2)}
             </span>

@@ -5,7 +5,7 @@ import { CarIcon } from '@/components/icons';
 
 export default function LoginPage() {
   return (
-    <div className="mx-auto grid max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lift md:grid-cols-2">
+    <div className="mx-auto grid max-w-4xl overflow-hidden glass-strong rounded-3xl shadow-lift md:grid-cols-2">
       <div
         aria-hidden="true"
         className="relative hidden bg-gradient-to-br from-slate-950 via-blue-950 to-blue-800 p-8 text-white md:flex md:flex-col md:justify-between"

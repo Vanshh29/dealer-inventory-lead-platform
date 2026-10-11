@@ -63,7 +63,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
           <Gallery images={v.images} title={title} vehicle={v} />
         </div>
         <div className="space-y-5 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
-          <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+          <header className="glass rounded-2xl p-6">
             <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
             <p className="mt-3 text-4xl font-extrabold tracking-tight text-blue-800">
               {formatEuro(v.priceCents)}
@@ -77,17 +77,14 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
             </h2>
             <dl className="grid grid-cols-2 gap-3">
               {specs.map(({ label, value, icon: Icon }) => (
-                <div
-                  key={label}
-                  className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm"
-                >
+                <div key={label} className="glass rounded-2xl p-3.5">
                   <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-600">
                     <Icon className="h-4 w-4 text-blue-700" /> {label}
                   </dt>
                   <dd className="mt-1 font-semibold text-slate-900">{value}</dd>
                 </div>
               ))}
-              <div className="col-span-2 rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
+              <div className="col-span-2 glass rounded-2xl p-3.5">
                 <dt className="text-xs font-medium uppercase tracking-wide text-slate-600">VIN</dt>
                 <dd className="mt-1 break-all font-mono text-sm font-medium text-slate-900">
                   {v.vin}
@@ -96,14 +93,14 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
             </dl>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+          <section className="glass rounded-2xl p-6">
             <LeadForm vehicleId={v.id} vehicleTitle={title} />
           </section>
         </div>
         {v.description && (
           <section
             aria-labelledby="desc-title"
-            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card lg:col-start-1 lg:row-start-2"
+            className="glass rounded-2xl p-6 lg:col-start-1 lg:row-start-2"
           >
             <h2 id="desc-title" className="text-lg font-semibold">
               Description

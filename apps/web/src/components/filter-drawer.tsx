@@ -125,7 +125,7 @@ export function FilterDrawer({
         role={open ? 'dialog' : undefined}
         aria-modal={open ? true : undefined}
         onKeyDown={onKeyDown}
-        className={`filter-drawer fixed inset-y-0 left-0 z-50 w-[88%] max-w-sm overflow-y-auto bg-white p-5 shadow-2xl transition-[transform,visibility] duration-300 ease-out lg:visible lg:static lg:z-auto lg:w-auto lg:max-w-none lg:translate-x-0 lg:overflow-visible lg:rounded-2xl lg:border lg:border-slate-200 lg:shadow-card lg:sticky lg:top-24 lg:self-start ${open ? 'translate-x-0' : 'invisible -translate-x-full'}`}
+        className={`filter-drawer fixed inset-y-0 left-0 z-50 w-[88%] max-w-sm overflow-y-auto bg-white/90 p-5 shadow-2xl backdrop-blur-xl transition-[transform,visibility] duration-300 ease-out lg:visible lg:static lg:z-auto lg:w-auto lg:max-w-none lg:translate-x-0 lg:overflow-visible lg:rounded-2xl lg:border lg:border-slate-200 lg:shadow-card lg:sticky lg:top-24 lg:self-start ${open ? 'translate-x-0' : 'invisible -translate-x-full'}`}
       >
         <div className="filter-close mb-4 flex items-center justify-between lg:hidden">
           <p className="text-lg font-bold">Filters</p>

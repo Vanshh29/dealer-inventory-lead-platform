@@ -15,7 +15,7 @@ const PAGE_SIZE = 20;
 
 export function VehiclesTable({ items }: { items: Vehicle[] }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+    <div className="overflow-x-auto glass-strong rounded-2xl">
       <table className="w-full text-left text-sm">
         <caption className="sr-only">Vehicles, newest first</caption>
         <thead className="bg-slate-50 text-slate-700">

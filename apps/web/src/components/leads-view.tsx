@@ -14,7 +14,7 @@ export const LEADS_PAGE_SIZE = 20;
 
 export function LeadsTable({ items }: { items: Lead[] }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-card">
+    <div className="overflow-x-auto glass-strong rounded-2xl">
       <table className="w-full text-left text-sm">
         <caption className="sr-only">Leads, newest first</caption>
         <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-700">

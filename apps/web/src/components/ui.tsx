@@ -5,14 +5,14 @@ import { InboxIcon } from './icons';
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50';
+  'inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 active:translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50';
 const variants: Record<Variant, string> = {
   primary:
-    'bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-sm shadow-blue-900/20 hover:from-blue-700 hover:to-blue-800 hover:shadow-md',
-  secondary:
-    'border border-slate-300 bg-white text-slate-900 shadow-sm hover:border-slate-400 hover:bg-slate-50',
-  danger: 'bg-red-700 text-white shadow-sm hover:bg-red-800',
-  ghost: 'text-slate-700 hover:bg-slate-100',
+    'bg-brand bg-[length:140%_100%] text-white shadow-md shadow-indigo-900/25 hover:bg-right hover:shadow-lg hover:shadow-indigo-700/40 hover:-translate-y-px',
+  secondary: 'glass text-slate-900 hover:bg-white hover:border-indigo-300 hover:-translate-y-px',
+  danger:
+    'bg-gradient-to-b from-red-600 to-red-700 text-white shadow-md shadow-red-900/20 hover:from-red-700 hover:to-red-800',
+  ghost: 'text-slate-700 hover:bg-white/70',
 };
 
 export const buttonClass = (variant: Variant = 'primary'): string => `${base} ${variants[variant]}`;
@@ -43,7 +43,7 @@ export function LinkButton({
 }
 
 export const inputClass =
-  'block w-full rounded-lg border border-slate-400 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition placeholder:text-slate-500 hover:border-slate-500 focus-visible:border-blue-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-700 disabled:bg-slate-100';
+  'block w-full rounded-xl border border-slate-300 bg-white/80 px-3 py-2.5 text-sm text-slate-900 shadow-sm transition placeholder:text-slate-500 hover:border-indigo-300 focus-visible:border-indigo-600 focus-visible:bg-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-600 disabled:bg-slate-100';
 
 /** Label + control + error text, wired together with ids for screen readers. */
 export function Field({
@@ -113,7 +113,7 @@ export function Spinner({ label = 'Loading…' }: { label?: string }) {
     <div role="status" className="flex items-center gap-2 py-8 text-slate-600">
       <span
         aria-hidden="true"
-        className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-700"
+        className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600"
       />
       <span>{label}</span>
     </div>
@@ -122,10 +122,10 @@ export function Spinner({ label = 'Loading…' }: { label?: string }) {
 
 export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-14 text-center">
+    <div className="glass animate-rise rounded-2xl border-dashed px-6 py-14 text-center">
       <span
         aria-hidden="true"
-        className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-700"
+        className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand text-white shadow-glow animate-pop"
       >
         <InboxIcon className="h-6 w-6" />
       </span>
@@ -137,7 +137,10 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
 
 export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-6 py-6 shadow-sm">
+    <div
+      role="alert"
+      className="animate-rise rounded-2xl border border-red-200 bg-red-50/90 px-6 py-6 shadow-sm backdrop-blur"
+    >
       <p className="font-medium text-red-900">{message}</p>
       {onRetry && (
         <Button variant="secondary" className="mt-3" onClick={onRetry}>
@@ -163,7 +166,7 @@ export function Pagination({
   const pages = Math.max(1, Math.ceil(total / limit));
   if (pages <= 1) return null;
   const linkClass =
-    'rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm transition hover:border-slate-400 hover:bg-slate-50';
+    'glass rounded-xl px-4 py-2 text-sm font-medium transition hover:-translate-y-px hover:bg-white';
   return (
     <nav aria-label="Pagination" className="mt-8 flex items-center justify-between gap-4">
       {page > 1 ? (
