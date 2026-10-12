@@ -46,3 +46,17 @@ export const formatDateTime = (iso: string): string =>
 
 export const vehicleTitle = (v: Pick<Vehicle, 'make' | 'model' | 'variant'>): string =>
   [v.make, v.model, v.variant].filter(Boolean).join(' ');
+
+/** Hours as a short human duration: minutes under an hour, otherwise one decimal of hours. */
+export const formatHours = (hours: number | null): string => {
+  if (hours === null) return '—';
+  if (hours < 1) return `${Math.max(1, Math.round(hours * 60))} min`;
+  return `${Math.round(hours * 10) / 10} h`;
+};
+
+export const LEAD_SOURCE_LABEL: Record<string, string> = {
+  WEB: 'Website',
+  PHONE: 'Phone',
+  MARKETPLACE: 'Marketplace',
+  OTHER: 'Other',
+};

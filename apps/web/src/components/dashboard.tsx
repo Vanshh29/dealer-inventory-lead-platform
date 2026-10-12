@@ -2,9 +2,14 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { LEAD_STATUSES, VEHICLE_STATUSES } from '@dealer/shared';
+import { LEAD_SOURCES, LEAD_STATUSES, VEHICLE_STATUSES } from '@dealer/shared';
 import { api, describeError } from '@/lib/api';
-import { LEAD_STATUS_LABEL, VEHICLE_STATUS_LABEL } from '@/lib/format';
+import {
+  formatHours,
+  LEAD_SOURCE_LABEL,
+  LEAD_STATUS_LABEL,
+  VEHICLE_STATUS_LABEL,
+} from '@/lib/format';
 import { useRemote } from '@/lib/use-remote';
 import { useUser } from '@/lib/session';
 import { ErrorState, Spinner } from './ui';
@@ -182,6 +187,7 @@ export function Dashboard() {
   const total = LEAD_STATUSES.reduce((n, st) => n + s.leads[st], 0);
   const open = s.leads.NEW + s.leads.CONTACTED + s.leads.TEST_DRIVE + s.leads.OFFER;
   const closed = s.leads.WON + s.leads.LOST;
+  const sourceTotal = LEAD_SOURCES.reduce((n, src) => n + s.leadsBySource[src], 0);
 
   return (
     <div className="space-y-8">
@@ -213,6 +219,65 @@ export function Dashboard() {
             label="Vehicles published"
             value={s.vehicles.PUBLISHED}
           />
+        </ul>
+      </section>
+
+      <section aria-labelledby="resp-h">
+        <h2 id="resp-h" className={H2}>
+          Response time
+        </h2>
+        <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Stat
+            index={0}
+            label="Average first response"
+            value={formatHours(s.firstResponse.averageHours)}
+            note={`${s.firstResponse.sampleSize} answered in the last 30 days`}
+          />
+          <Stat
+            index={1}
+            label="Median first response"
+            value={formatHours(s.firstResponse.medianHours)}
+            note="Half of leads are answered faster"
+          />
+          <Stat
+            index={2}
+            href="/admin/leads?status=NEW"
+            label="Waiting over 24 h"
+            value={s.overdueLeads}
+            dot={s.overdueLeads > 0 ? 'bg-rose-500' : 'bg-emerald-500'}
+            note={s.overdueLeads > 0 ? 'New leads that need a reply' : 'Everyone has been answered'}
+          />
+        </ul>
+      </section>
+
+      <section aria-labelledby="src-h">
+        <h2 id="src-h" className={H2}>
+          Where leads come from
+        </h2>
+        <ul className="glass space-y-3 rounded-2xl p-5">
+          {LEAD_SOURCES.map((src) => {
+            const n = s.leadsBySource[src];
+            const share = pct(n, sourceTotal);
+            return (
+              <li key={src}>
+                <div className="flex items-baseline justify-between text-sm">
+                  <span className="font-medium text-slate-800">{LEAD_SOURCE_LABEL[src]}</span>
+                  <span className="tabular-nums text-slate-700">
+                    <strong className="text-slate-900">{n}</strong> · {share}%
+                  </span>
+                </div>
+                <div
+                  aria-hidden="true"
+                  className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-200/80"
+                >
+                  <div
+                    className="h-full origin-left animate-grow rounded-full bg-brand"
+                    style={{ width: `${share}%` }}
+                  />
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </section>
 

@@ -1,4 +1,50 @@
 import { useId } from 'react';
+import type { BodyType } from '@/lib/body-type';
+
+type Shape = {
+  body: string;
+  windows: string[];
+  pillars: number[];
+  rails?: string;
+  cladding?: string;
+};
+
+const SHAPES: Record<BodyType, Shape> = {
+  hatch: {
+    body: 'M38 214c0-17 12-27 34-31l36-52c8-11 18-17 32-17h96c15 0 27 7 36 20l30 47c26 4 42 15 42 33v14H38v-14Z',
+    windows: [
+      'M122 176l26-42c4-6 9-9 16-9h38v51H122Z',
+      'M210 125h30c8 0 14 3 19 10l22 41h-71v-51Z',
+    ],
+    pillars: [205],
+  },
+  sedan: {
+    body: 'M38 214c0-12 6-22 22-26l60-6 24-44c4-6 10-9 18-9h90c10 0 18 4 24 11l34 40 46 10c14 3 22 12 22 24v14H38v-14Z',
+    windows: ['M132 176l20-36c3-5 7-7 12-7h36v43z', 'M208 133h42c7 0 12 3 16 8l24 35h-82z'],
+    pillars: [204],
+  },
+  wagon: {
+    body: 'M38 214c0-12 6-22 22-26l12-46c1-7 7-12 14-12h166c10 0 18 4 24 11l34 39 46 10c14 3 22 12 22 24v14H38v-14Z',
+    windows: [
+      'M90 176l-4-38c0-3 2-5 5-5h54v43z',
+      'M152 133h50v43h-50z',
+      'M209 133h41c7 0 12 3 16 8l24 35h-81z',
+    ],
+    pillars: [148, 205],
+    rails: 'M90 125h160',
+  },
+  suv: {
+    body: 'M38 212c0-14 8-24 24-27l8-60c1-8 8-14 16-14h166c9 0 17 5 22 12l32 52c24 3 56 12 56 32v21H38v-16Z',
+    windows: [
+      'M80 175l6-50c0-4 3-7 7-7h46v57z',
+      'M146 118h56v57h-56z',
+      'M209 118h40c6 0 10 3 13 7l26 50h-79z',
+    ],
+    pillars: [142, 205],
+    rails: 'M92 106h158',
+    cladding: 'M38 212h324v16H38z',
+  },
+};
 
 const BODY: Record<string, string> = {
   black: '#1f2937',
@@ -42,17 +88,20 @@ export function CarArt({
   seed,
   colour,
   label,
+  body: bodyType = 'hatch',
   className = 'h-full w-full',
 }: {
   seed: string;
+  body?: BodyType;
   colour?: string | null;
   label: string;
   className?: string;
 }) {
   const uid = useId().replace(/:/g, '');
   const [from, to] = BACKDROPS[hash(seed) % BACKDROPS.length];
-  const body = bodyColour(colour);
-  const dark = body === '#1f2937';
+  const paint = bodyColour(colour);
+  const dark = paint === '#1f2937';
+  const shape = SHAPES[bodyType];
   return (
     <svg
       viewBox="0 0 400 300"
@@ -78,23 +127,30 @@ export function CarArt({
       <rect width="400" height="300" fill={`url(#${uid}-bg)`} />
       <rect y="232" width="400" height="68" fill="#0f172a" opacity="0.06" />
       <ellipse cx="200" cy="246" rx="162" ry="10" fill="#0f172a" opacity="0.18" />
-      <path
-        id={`${uid}-body`}
-        d="M38 214c0-17 12-27 34-31l36-52c8-11 18-17 32-17h96c15 0 27 7 36 20l30 47c26 4 42 15 42 33v14H38v-14Z"
-        fill={body}
-      />
-      <path
-        d="M38 214c0-17 12-27 34-31l36-52c8-11 18-17 32-17h96c15 0 27 7 36 20l30 47c26 4 42 15 42 33v14H38v-14Z"
-        fill={`url(#${uid}-sheen)`}
-      />
-      <path d="M122 176l26-42c4-6 9-9 16-9h38v51H122Z" fill={`url(#${uid}-glass)`} />
-      <path d="M210 125h30c8 0 14 3 19 10l22 41h-71v-51Z" fill={`url(#${uid}-glass)`} />
-      <path
-        d="M205 125v51"
-        stroke={dark ? '#475569' : '#0f172a'}
-        strokeOpacity="0.35"
-        strokeWidth="3"
-      />
+      <path d={shape.body} fill={paint} />
+      <path d={shape.body} fill={`url(#${uid}-sheen)`} />
+      {shape.cladding && <path d={shape.cladding} fill="#0f172a" opacity="0.28" />}
+      {shape.rails && (
+        <path
+          d={shape.rails}
+          stroke="#0f172a"
+          strokeOpacity="0.45"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+      )}
+      {shape.windows.map((d) => (
+        <path key={d} d={d} fill={`url(#${uid}-glass)`} />
+      ))}
+      {shape.pillars.map((x) => (
+        <path
+          key={x}
+          d={`M${x} 118v58`}
+          stroke={dark ? '#475569' : '#0f172a'}
+          strokeOpacity="0.35"
+          strokeWidth="3"
+        />
+      ))}
       <rect x="338" y="190" width="22" height="9" rx="4" fill="#fef9c3" />
       <rect x="40" y="192" width="14" height="8" rx="3" fill="#ef4444" opacity="0.85" />
       <path

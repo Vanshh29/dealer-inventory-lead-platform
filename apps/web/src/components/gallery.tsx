@@ -12,7 +12,7 @@ export function Gallery({
 }: {
   images: VehicleImage[];
   title: string;
-  vehicle: { id: string; color: string | null };
+  vehicle: { id: string; color: string | null; model?: string; variant?: string | null };
 }) {
   const [index, setIndex] = useState(0);
 

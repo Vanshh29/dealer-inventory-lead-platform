@@ -16,7 +16,7 @@ export default function LoginPage() {
         <div>
           <div className="mb-6 overflow-hidden rounded-2xl ring-1 ring-white/20">
             <div className="aspect-[4/3]">
-              <CarArt seed="login" colour="silver" label="" />
+              <CarArt seed="login" colour="silver" body="sedan" label="" />
             </div>
           </div>
           <p className="text-2xl font-bold leading-snug">

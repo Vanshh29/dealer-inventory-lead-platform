@@ -1,5 +1,6 @@
 import type { VehicleImage } from '@dealer/shared';
 import { assetUrl } from '@/lib/api';
+import { bodyTypeOf } from '@/lib/body-type';
 import { CarArt } from './car-art';
 
 /** The demo seed links to placehold.co grey boxes; those are shown as a drawn car instead. */
@@ -20,7 +21,7 @@ export function VehiclePhoto({
   className = 'h-full w-full object-cover',
 }: {
   image: Pick<VehicleImage, 'url'>;
-  vehicle: { id: string; color?: string | null };
+  vehicle: { id: string; color?: string | null; model?: string; variant?: string | null };
   alt: string;
   loading?: 'lazy';
   className?: string;
@@ -30,6 +31,7 @@ export function VehiclePhoto({
       <CarArt
         seed={`${vehicle.id}${image.url}`}
         colour={vehicle.color}
+        body={bodyTypeOf(vehicle)}
         label={alt}
         className={className}
       />

@@ -119,7 +119,7 @@ export default async function HomePage() {
             className="glass-dark relative hidden animate-float overflow-hidden rounded-3xl p-3 shadow-2xl shadow-indigo-950/50 lg:block"
           >
             <div className="aspect-[4/3] overflow-hidden rounded-2xl">
-              <CarArt seed="hero" colour="blue" label="" />
+              <CarArt seed="hero" colour="blue" body="suv" label="" />
             </div>
           </div>
         </div>
