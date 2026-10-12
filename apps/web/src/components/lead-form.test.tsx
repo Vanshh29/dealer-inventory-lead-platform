@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ApiError } from '@/lib/api';
 import { api } from '@/lib/api';
-import { LeadForm, validateLead } from './lead-form';
+import { LeadForm, readUtm, validateLead } from './lead-form';
 
 jest.mock('@/lib/api', () => ({
   ...jest.requireActual('@/lib/api'),
@@ -12,11 +12,12 @@ const submit = api.leads.submit as jest.Mock;
 
 const fill = async (
   user: ReturnType<typeof userEvent.setup>,
-  o: { name?: string; email?: string; phone?: string } = {},
+  o: { name?: string; email?: string; phone?: string; consent?: boolean } = {},
 ) => {
   await user.type(screen.getByLabelText('Name'), o.name ?? 'Erika Musterfrau');
   await user.type(screen.getByLabelText('Email'), o.email ?? 'erika@example.com');
   if (o.phone) await user.type(screen.getByLabelText(/Phone/), o.phone);
+  if (o.consent !== false) await user.click(screen.getByLabelText(/I agree/));
 };
 
 beforeEach(() => submit.mockReset());
@@ -40,6 +41,44 @@ describe('LeadForm', () => {
       'Please enter a valid email address.',
     );
     expect(submit).not.toHaveBeenCalled();
+  });
+
+  it('requires consent, shows a field error and does not call the API', async () => {
+    const user = userEvent.setup();
+    render(<LeadForm vehicleId="v1" vehicleTitle="VW Golf" />);
+    await fill(user, { consent: false });
+    await user.click(screen.getByRole('button', { name: 'Send request' }));
+
+    const box = screen.getByLabelText(/I agree/);
+    expect(box).toHaveAttribute('aria-invalid', 'true');
+    expect(box).toHaveAccessibleDescription(/Please agree to the privacy notice/);
+    expect(submit).not.toHaveBeenCalled();
+  });
+
+  it('shows the privacy notice, the reply promise and autocomplete hints', () => {
+    render(<LeadForm vehicleId="v1" vehicleTitle="VW Golf" />);
+    expect(screen.getByText(/Privacy notice:/)).toBeInTheDocument();
+    expect(screen.getByText('We reply within one business day.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toHaveAttribute('autocomplete', 'name');
+    expect(screen.getByLabelText('Email')).toHaveAttribute('autocomplete', 'email');
+    expect(screen.getByLabelText(/Phone/)).toHaveAttribute('autocomplete', 'tel');
+  });
+
+  it('sends consent and the UTM parameters of the landing URL', async () => {
+    submit.mockResolvedValue(undefined);
+    window.history.replaceState(null, '', '/vehicles/v1?utm_source=google&utm_medium=cpc');
+    const user = userEvent.setup();
+    render(<LeadForm vehicleId="v1" vehicleTitle="VW Golf" />);
+    await fill(user);
+    await user.click(screen.getByRole('button', { name: 'Send request' }));
+    await waitFor(() => expect(submit).toHaveBeenCalled());
+    expect(submit.mock.calls[0][0]).toMatchObject({
+      consent: true,
+      utmSource: 'google',
+      utmMedium: 'cpc',
+      utmCampaign: undefined,
+    });
+    window.history.replaceState(null, '', '/');
   });
 
   it('submits trimmed data with an empty honeypot and shows a confirmation', async () => {
@@ -117,12 +156,24 @@ describe('LeadForm', () => {
 });
 
 describe('validateLead', () => {
-  const ok = { name: 'A', email: 'a@b.de', phone: '', message: 'hi' };
+  const ok = { name: 'A', email: 'a@b.de', phone: '', message: 'hi', consent: true };
   it('accepts valid input', () => expect(validateLead(ok)).toEqual({}));
+  it('requires consent', () =>
+    expect(validateLead({ ...ok, consent: false }).consent).toBeDefined());
   it('mirrors the API limits', () => {
     expect(validateLead({ ...ok, name: 'x'.repeat(101) }).name).toBeDefined();
     expect(validateLead({ ...ok, message: 'x'.repeat(2001) }).message).toBeDefined();
     expect(validateLead({ ...ok, phone: 'call me' }).phone).toBeDefined();
     expect(validateLead({ ...ok, phone: '+49 (170) 123-456' }).phone).toBeUndefined();
+  });
+});
+
+describe('readUtm', () => {
+  it('reads and caps campaign parameters, ignoring blanks', () => {
+    expect(readUtm('?utm_source=news&utm_medium=%20&utm_campaign=' + 'x'.repeat(150))).toEqual({
+      utmSource: 'news',
+      utmMedium: undefined,
+      utmCampaign: 'x'.repeat(100),
+    });
   });
 });

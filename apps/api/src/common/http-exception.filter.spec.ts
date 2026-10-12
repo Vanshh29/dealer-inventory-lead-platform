@@ -1,3 +1,4 @@
+import { ThrottlerException } from '@nestjs/throttler';
 import { ArgumentsHost, BadRequestException } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import { AllExceptionsFilter } from './http-exception.filter';
@@ -39,5 +40,38 @@ describe('AllExceptionsFilter and Sentry', () => {
     const host = { getType: () => 'graphql' } as unknown as ArgumentsHost;
     expect(filter.catch(boom, host)).toBe(boom);
     expect(Sentry.captureException).toHaveBeenCalledWith(boom);
+  });
+
+  it('answers 413 for oversized bodies without reporting them', () => {
+    const { res, host } = http();
+    filter.catch(
+      Object.assign(new Error('too large'), { type: 'entity.too.large', status: 413 }),
+      host,
+    );
+    expect(res.status).toHaveBeenCalledWith(413);
+    expect(res.json).toHaveBeenCalledWith({
+      statusCode: 413,
+      error: 'PayloadTooLarge',
+      message: 'Request body too large',
+    });
+    expect(Sentry.captureException).not.toHaveBeenCalled();
+  });
+
+  it('answers 400 for malformed JSON without reporting it', () => {
+    const { res, host } = http();
+    filter.catch(Object.assign(new Error('bad json'), { type: 'entity.parse.failed' }), host);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(Sentry.captureException).not.toHaveBeenCalled();
+  });
+
+  it('normalises throttler errors', () => {
+    const { res, host } = http();
+    filter.catch(new ThrottlerException(), host);
+    expect(res.status).toHaveBeenCalledWith(429);
+    expect(res.json).toHaveBeenCalledWith({
+      statusCode: 429,
+      error: 'TooManyRequests',
+      message: 'Too many requests',
+    });
   });
 });

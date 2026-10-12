@@ -38,3 +38,4 @@ export const serverApi = (cookieHeader: string): ApiClient =>
 export function assetUrl(url: string): string {
   return url.startsWith('/') ? `${PUBLIC_API_URL}${url}` : url;
 }
+export type { Stats, LeadSource } from '@dealer/shared';

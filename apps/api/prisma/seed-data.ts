@@ -1,42 +1,56 @@
 import { createHash } from 'node:crypto';
 import { FuelType, Gearbox, Prisma, VehicleStatus } from '@prisma/client';
 
+interface VariantSpec {
+  name: string;
+  fuel: FuelType;
+  /** First model year of this powertrain, when later than the model's own `since`. */
+  from?: number;
+}
+
 interface ModelSpec {
   model: string;
-  variants: string[];
-  fuels: FuelType[];
+  variants: VariantSpec[];
   /** Approximate new price in EUR, used to derive a plausible used price. */
   newPrice: number;
   since: number;
 }
 
-const CATALOG: Record<string, ModelSpec[]> = {
+const v = (name: string, fuel: FuelType, from?: number): VariantSpec => ({ name, fuel, from });
+
+// The fuel belongs to the variant (a "1.5 D" is a diesel, an "e-tron" is electric), never random.
+export const CATALOG: Record<string, ModelSpec[]> = {
   Volkswagen: [
     {
       model: 'Golf',
-      variants: ['1.5 TSI Life', '2.0 TDI Style', 'GTI', '1.0 eTSI Active'],
-      fuels: ['PETROL', 'DIESEL', 'HYBRID'],
+      variants: [
+        v('1.5 TSI Life', 'PETROL', 2017),
+        v('2.0 TDI Style', 'DIESEL'),
+        v('GTI', 'PETROL'),
+        v('1.0 eTSI Active', 'HYBRID', 2020),
+      ],
       newPrice: 32000,
       since: 2012,
     },
     {
       model: 'Passat',
-      variants: ['2.0 TDI Business', '1.5 TSI Elegance', 'GTE'],
-      fuels: ['DIESEL', 'PETROL', 'PLUGIN_HYBRID'],
+      variants: [
+        v('2.0 TDI Business', 'DIESEL'),
+        v('1.5 TSI Elegance', 'PETROL', 2018),
+        v('GTE', 'PLUGIN_HYBRID', 2015),
+      ],
       newPrice: 42000,
       since: 2012,
     },
     {
       model: 'Tiguan',
-      variants: ['2.0 TDI R-Line', '1.5 TSI Life'],
-      fuels: ['DIESEL', 'PETROL'],
+      variants: [v('2.0 TDI R-Line', 'DIESEL'), v('1.5 TSI Life', 'PETROL', 2018)],
       newPrice: 40000,
       since: 2013,
     },
     {
       model: 'ID.3',
-      variants: ['Pro', 'Pro S'],
-      fuels: ['ELECTRIC'],
+      variants: [v('Pro', 'ELECTRIC'), v('Pro S', 'ELECTRIC')],
       newPrice: 40000,
       since: 2020,
     },
@@ -44,39 +58,34 @@ const CATALOG: Record<string, ModelSpec[]> = {
   BMW: [
     {
       model: '320d',
-      variants: ['Touring', 'M Sport', 'Advantage'],
-      fuels: ['DIESEL'],
+      variants: [v('Touring', 'DIESEL'), v('M Sport', 'DIESEL'), v('Advantage', 'DIESEL')],
       newPrice: 46000,
       since: 2012,
     },
     {
       model: 'X3',
-      variants: ['xDrive20d', 'xDrive30e'],
-      fuels: ['DIESEL', 'PLUGIN_HYBRID'],
+      variants: [v('xDrive20d', 'DIESEL'), v('xDrive30e', 'PLUGIN_HYBRID', 2020)],
       newPrice: 58000,
       since: 2013,
     },
-    { model: 'i4', variants: ['eDrive40'], fuels: ['ELECTRIC'], newPrice: 65000, since: 2021 },
+    { model: 'i4', variants: [v('eDrive40', 'ELECTRIC')], newPrice: 65000, since: 2021 },
   ],
   'Mercedes-Benz': [
     {
       model: 'C 220 d',
-      variants: ['Avantgarde', 'AMG Line'],
-      fuels: ['DIESEL'],
+      variants: [v('Avantgarde', 'DIESEL'), v('AMG Line', 'DIESEL')],
       newPrice: 48000,
       since: 2012,
     },
     {
       model: 'A 180',
-      variants: ['Style', 'Progressive'],
-      fuels: ['PETROL'],
+      variants: [v('Style', 'PETROL'), v('Progressive', 'PETROL')],
       newPrice: 34000,
       since: 2013,
     },
     {
       model: 'GLC 300',
-      variants: ['4MATIC'],
-      fuels: ['PETROL', 'PLUGIN_HYBRID'],
+      variants: [v('4MATIC', 'PETROL'), v('e 4MATIC', 'PLUGIN_HYBRID', 2020)],
       newPrice: 60000,
       since: 2016,
     },
@@ -84,45 +93,38 @@ const CATALOG: Record<string, ModelSpec[]> = {
   Audi: [
     {
       model: 'A3',
-      variants: ['Sportback 35 TFSI', '30 TDI'],
-      fuels: ['PETROL', 'DIESEL'],
+      variants: [v('Sportback 35 TFSI', 'PETROL'), v('30 TDI', 'DIESEL')],
       newPrice: 34000,
       since: 2012,
     },
     {
       model: 'A4',
-      variants: ['Avant 40 TDI', '45 TFSI quattro'],
-      fuels: ['DIESEL', 'PETROL'],
+      variants: [v('Avant 40 TDI', 'DIESEL'), v('45 TFSI quattro', 'PETROL')],
       newPrice: 46000,
       since: 2012,
     },
     {
       model: 'Q3',
-      variants: ['35 TFSI', '35 TDI'],
-      fuels: ['PETROL', 'DIESEL'],
+      variants: [v('35 TFSI', 'PETROL'), v('35 TDI', 'DIESEL')],
       newPrice: 40000,
       since: 2012,
     },
-    {
-      model: 'e-tron',
-      variants: ['50 quattro'],
-      fuels: ['ELECTRIC'],
-      newPrice: 70000,
-      since: 2019,
-    },
+    { model: 'e-tron', variants: [v('50 quattro', 'ELECTRIC')], newPrice: 70000, since: 2019 },
   ],
   Opel: [
     {
       model: 'Corsa',
-      variants: ['1.2 Edition', 'GS Line', 'Corsa-e'],
-      fuels: ['PETROL', 'ELECTRIC'],
+      variants: [
+        v('1.2 Edition', 'PETROL'),
+        v('GS Line', 'PETROL'),
+        v('Corsa-e', 'ELECTRIC', 2020),
+      ],
       newPrice: 20000,
       since: 2012,
     },
     {
       model: 'Astra',
-      variants: ['1.4 Turbo Elegance', '1.5 D Business'],
-      fuels: ['PETROL', 'DIESEL'],
+      variants: [v('1.4 Turbo Elegance', 'PETROL'), v('1.5 D Business', 'DIESEL', 2019)],
       newPrice: 26000,
       since: 2012,
     },
@@ -130,32 +132,23 @@ const CATALOG: Record<string, ModelSpec[]> = {
   Skoda: [
     {
       model: 'Octavia',
-      variants: ['Combi 2.0 TDI Style', '1.5 TSI Ambition'],
-      fuels: ['DIESEL', 'PETROL'],
+      variants: [v('Combi 2.0 TDI Style', 'DIESEL'), v('1.5 TSI Ambition', 'PETROL', 2018)],
       newPrice: 31000,
       since: 2012,
     },
-    {
-      model: 'Fabia',
-      variants: ['1.0 TSI Cool Plus'],
-      fuels: ['PETROL'],
-      newPrice: 19000,
-      since: 2012,
-    },
-    { model: 'Enyaq', variants: ['iV 80'], fuels: ['ELECTRIC'], newPrice: 50000, since: 2021 },
+    { model: 'Fabia', variants: [v('1.0 TSI Cool Plus', 'PETROL')], newPrice: 20000, since: 2012 },
+    { model: 'Enyaq', variants: [v('iV 80', 'ELECTRIC')], newPrice: 50000, since: 2021 },
   ],
   Ford: [
     {
       model: 'Focus',
-      variants: ['1.0 EcoBoost Titanium', '1.5 TDCi'],
-      fuels: ['PETROL', 'DIESEL'],
+      variants: [v('1.0 EcoBoost Titanium', 'PETROL'), v('1.5 TDCi', 'DIESEL')],
       newPrice: 25000,
       since: 2012,
     },
     {
       model: 'Kuga',
-      variants: ['2.5 Hybrid ST-Line', '1.5 EcoBoost'],
-      fuels: ['HYBRID', 'PETROL'],
+      variants: [v('2.5 Hybrid ST-Line', 'HYBRID', 2020), v('1.5 EcoBoost', 'PETROL')],
       newPrice: 38000,
       since: 2013,
     },
@@ -163,15 +156,13 @@ const CATALOG: Record<string, ModelSpec[]> = {
   Toyota: [
     {
       model: 'Yaris',
-      variants: ['Hybrid Comfort', '1.5 VVT-i'],
-      fuels: ['HYBRID', 'PETROL'],
+      variants: [v('Hybrid Comfort', 'HYBRID'), v('1.5 VVT-i', 'PETROL')],
       newPrice: 22000,
       since: 2012,
     },
     {
       model: 'Corolla',
-      variants: ['2.0 Hybrid Touring Sports', '1.8 Hybrid'],
-      fuels: ['HYBRID'],
+      variants: [v('2.0 Hybrid Touring Sports', 'HYBRID'), v('1.8 Hybrid', 'HYBRID')],
       newPrice: 31000,
       since: 2019,
     },
@@ -179,24 +170,20 @@ const CATALOG: Record<string, ModelSpec[]> = {
   Renault: [
     {
       model: 'Clio',
-      variants: ['TCe 90 Intens', 'E-Tech Hybrid'],
-      fuels: ['PETROL', 'HYBRID'],
+      variants: [v('TCe 90 Intens', 'PETROL'), v('E-Tech Hybrid', 'HYBRID', 2020)],
       newPrice: 20000,
       since: 2012,
     },
-    {
-      model: 'Zoe',
-      variants: ['R135 Experience'],
-      fuels: ['ELECTRIC'],
-      newPrice: 34000,
-      since: 2013,
-    },
+    { model: 'Zoe', variants: [v('R135 Experience', 'ELECTRIC')], newPrice: 34000, since: 2013 },
   ],
   Tesla: [
     {
       model: 'Model 3',
-      variants: ['Long Range', 'Standard Range Plus', 'Performance'],
-      fuels: ['ELECTRIC'],
+      variants: [
+        v('Long Range', 'ELECTRIC'),
+        v('Standard Range Plus', 'ELECTRIC'),
+        v('Performance', 'ELECTRIC'),
+      ],
       newPrice: 50000,
       since: 2019,
     },
@@ -204,12 +191,11 @@ const CATALOG: Record<string, ModelSpec[]> = {
   Hyundai: [
     {
       model: 'i30',
-      variants: ['1.0 T-GDI Trend', '1.6 CRDi'],
-      fuels: ['PETROL', 'DIESEL'],
+      variants: [v('1.0 T-GDI Trend', 'PETROL'), v('1.6 CRDi', 'DIESEL')],
       newPrice: 24000,
       since: 2012,
     },
-    { model: 'Ioniq 5', variants: ['72.6 kWh'], fuels: ['ELECTRIC'], newPrice: 50000, since: 2021 },
+    { model: 'Ioniq 5', variants: [v('72.6 kWh', 'ELECTRIC')], newPrice: 50000, since: 2021 },
   ],
 };
 
@@ -275,18 +261,17 @@ export function generateVehicles(count: number, referenceYear = 2026) {
   for (let i = 0; i < count; i++) {
     const make = pick(makes);
     const spec = pick(CATALOG[make]);
-    const year = Math.min(
-      referenceYear,
-      spec.since + Math.floor(rand() * (referenceYear - spec.since + 1)),
-    );
+    const variantSpec = pick(spec.variants);
+    const first = Math.max(spec.since, variantSpec.from ?? 0);
+    const year = Math.min(referenceYear, first + Math.floor(rand() * (referenceYear - first + 1)));
     const age = referenceYear - year;
-    const fuel = pick(spec.fuels);
+    const fuel = variantSpec.fuel;
     const mileage = Math.round((age * 14000 + rand() * 25000) / 100) * 100;
 
-    // Straight-line-ish depreciation: ~12 %/year, plus a little for mileage, with noise.
+    // ~10 %/year depreciation with a floor (old cars keep value), a modest mileage penalty and noise.
     const factor =
-      Math.max(0.12, Math.pow(0.88, age)) *
-      (1 - Math.min(0.25, mileage / 900000)) *
+      Math.max(0.25, Math.pow(0.9, age)) *
+      (1 - Math.min(0.15, mileage / 1_500_000)) *
       (0.93 + rand() * 0.14);
     const priceCents = Math.round((spec.newPrice * factor) / 50) * 50 * 100;
 
@@ -294,7 +279,7 @@ export function generateVehicles(count: number, referenceYear = 2026) {
     const r = rand();
     const status: VehicleStatus =
       r < 0.7 ? 'PUBLISHED' : r < 0.8 ? 'DRAFT' : r < 0.9 ? 'RESERVED' : 'SOLD';
-    const variant = pick(spec.variants);
+    const variant = variantSpec.name;
     const features = [...EQUIPMENT].sort(() => rand() - 0.5).slice(0, 3 + Math.floor(rand() * 3));
 
     const vin = vinFor(i);
@@ -368,6 +353,7 @@ export function generateLeads(
   vehicles: Prisma.VehicleCreateManyInput[],
   count: number,
   salesUserId: string,
+  now: Date = new Date(),
 ) {
   const rand = mulberry32(7);
   const pick = <T>(arr: T[]): T => arr[Math.floor(rand() * arr.length)];
@@ -384,6 +370,19 @@ export function generateLeads(
     'LOST',
   ] as const;
 
+  // Mostly website enquiries, with some phone and marketplace leads for the source breakdown.
+  const sources = [
+    'WEB',
+    'WEB',
+    'WEB',
+    'WEB',
+    'WEB',
+    'PHONE',
+    'PHONE',
+    'MARKETPLACE',
+    'MARKETPLACE',
+    'OTHER',
+  ] as const;
   const leads: Prisma.LeadCreateManyInput[] = [];
   const notes: Prisma.LeadNoteCreateManyInput[] = [];
   for (let i = 0; i < count; i++) {
@@ -391,6 +390,12 @@ export function generateLeads(
     const last = pick(LAST);
     const status = pick([...statuses]);
     const id = uuidFor(`lead-${i}`);
+    // Spread over the last 60 days so the 30-day response statistics have data.
+    const createdAt = new Date(now.getTime() - Math.floor(rand() * 60 * 24) * 3_600_000);
+    // 30 minutes to 30 hours to first response, never in the future.
+    const respondedAt = new Date(
+      Math.min(now.getTime(), createdAt.getTime() + (0.5 + rand() * 29.5) * 3_600_000),
+    );
     leads.push({
       id,
       vehicleId: pick(published).id as string,
@@ -400,7 +405,10 @@ export function generateLeads(
       message: pick(MESSAGES),
       status,
       assignedToId: status === 'NEW' ? null : salesUserId,
-      createdAt: new Date(Date.UTC(2026, 5, 1) + Math.floor(rand() * 120) * 86_400_000),
+      source: pick([...sources]),
+      consentAt: createdAt,
+      firstRespondedAt: status === 'NEW' ? null : respondedAt,
+      createdAt,
     });
     if (status !== 'NEW') {
       notes.push({

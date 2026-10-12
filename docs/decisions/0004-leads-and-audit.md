@@ -38,10 +38,24 @@ CONTACTED may also jump straight to OFFER.
 
 ## Personal data (GDPR, relevant for a German dealership)
 
-Leads hold a name, e-mail, optional phone and a free-text message. Mitigations in place: minimal fields, no personal data in logs, notes not copied into the audit trail, access limited to authenticated staff. **Not implemented** (would be needed before real use): privacy notice/consent checkbox on the form, a retention/deletion job (e.g. delete closed leads after N months), and a data-subject export/erasure procedure.
+Leads hold a name, e-mail, optional phone and a free-text message. Mitigations in place: minimal fields, no personal data in logs, notes not copied into the audit trail, access limited to authenticated staff. The public form now requires explicit consent (see below). **Not implemented** (would be needed before real use): a retention/deletion job (e.g. delete closed leads after N months), and a data-subject export/erasure procedure.
 
 ## Data model choices
 
 - `Lead.vehicleId` is nullable with `ON DELETE SET NULL`, so deleting a vehicle never destroys sales history (tested). `assignedToId` also `SET NULL`.
 - Indexes: `(status, createdAt)` for the board/list filtered by status, `(assignedToId, status)` for "my leads", `(vehicleId)`, `(createdAt)`; notes `(leadId, createdAt)`.
 - Name/e-mail search uses case-insensitive `contains` (sequential scan). Fine for the expected volume of leads; a `pg_trgm` GIN index is the upgrade path.
+
+## Lead source, consent and response time (addendum)
+
+- `Lead.source` (`WEB` default, `PHONE`, `MARKETPLACE`, `OTHER`) and optional `utmSource/utmMedium/utmCampaign`. The public form always creates `WEB` leads; the UTM values come from the landing URL (`utm_*`), are trimmed and capped at 100 characters.
+- **Consent:** `POST /leads` requires `consent: true` (anything else is 400) and stores the server time as `consentAt`. Leads created before this change have `consentAt = null`. The form shows the privacy notice sentence next to a required checkbox; a dedicated privacy page is still to be written.
+- **First response:** `firstRespondedAt` is set by `changeStatus` the first time a lead leaves `NEW` (to `CONTACTED` or `LOST`), in the same transaction and compare-and-set update as the audit entry; later changes never move it. Existing leads are not backfilled.
+- **`GET /admin/stats`** keeps `leads` and `vehicles` and adds `firstResponse { averageHours, medianHours, sampleSize }` (leads answered in the last 30 days, one decimal, `null` when none), `overdueLeads` (status `NEW`, older than 24 hours) and `leadsBySource` (every source present, 0 if none). The medians are computed in the API from the 30-day window rather than in SQL; fine at this volume.
+
+## SEO endpoints (web)
+
+- `/sitemap.xml` (`app/sitemap.ts`): home, `/vehicles` and every published vehicle detail URL, read through the public catalog API (revalidated hourly). If the API is unreachable only the two static routes are returned.
+- `/robots.txt` (`app/robots.ts`): allows everything except `/admin` and points at the sitemap.
+- `VehicleJsonLd` (`components/vehicle-jsonld.tsx`) renders schema.org `Car` + `Offer` JSON-LD (EUR price from `priceCents`, mileage, VIN, model year, fuel, availability from the vehicle status). `<` is escaped in the serialised JSON so vehicle text cannot close the script tag.
+- Absolute URLs use `NEXT_PUBLIC_SITE_URL` (fallback `http://localhost:3000`); set it in production.

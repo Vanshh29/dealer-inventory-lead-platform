@@ -112,6 +112,23 @@ describe('Back-office leads', () => {
     });
   });
 
+  describe('first response time', () => {
+    it('is stamped when the lead first leaves NEW and never moved afterwards', async () => {
+      const lead = await createLead(app, vehicleId);
+      const sales = await loginAs(app, 'SALES');
+      expect(lead.firstRespondedAt).toBeNull();
+
+      await sales.patch(`/admin/leads/${lead.id}/status`).send({ status: 'CONTACTED' }).expect(200);
+      const first = (await prisma().lead.findUniqueOrThrow({ where: { id: lead.id } }))
+        .firstRespondedAt;
+      expect(first).toBeInstanceOf(Date);
+
+      await sales.patch(`/admin/leads/${lead.id}/status`).send({ status: 'OFFER' }).expect(200);
+      const later = await prisma().lead.findUniqueOrThrow({ where: { id: lead.id } });
+      expect(later.firstRespondedAt).toEqual(first);
+    });
+  });
+
   describe('lead lifecycle', () => {
     it('goes NEW -> WON through the API with an audit entry per step, attributed to the actor', async () => {
       const lead = await createLead(app, vehicleId);
@@ -126,6 +143,7 @@ describe('Back-office leads', () => {
         expect(res.body.status).toBe(status);
       }
       const final = await agent.get(`/admin/leads/${lead.id}`).expect(200);
+      expect(final.body.firstRespondedAt).toEqual(expect.any(String));
       expect(final.body).toMatchObject({ status: 'WON', allowedTransitions: [] });
 
       const entries = await auditFor(lead.id);

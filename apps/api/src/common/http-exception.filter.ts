@@ -2,6 +2,17 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from '@n
 import * as Sentry from '@sentry/node';
 import { Response } from 'express';
 
+function bodyParserError(e: unknown) {
+  const err = e as { type?: unknown; status?: unknown } | null;
+  if (err?.type === 'entity.too.large') {
+    return { statusCode: 413, error: 'PayloadTooLarge', message: 'Request body too large' };
+  }
+  if (err?.type === 'entity.parse.failed') {
+    return { statusCode: 400, error: 'BadRequest', message: 'Malformed request body' };
+  }
+  return null;
+}
+
 /** Every error leaves the API as { statusCode, error, message, details? }. */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -18,11 +29,27 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
     const res = host.switchToHttp().getResponse<Response>();
 
+    // Body-parser (http-errors) failures arrive as plain errors with a status and a `type`.
+    const parser = bodyParserError(exception);
+    if (parser) {
+      res.status(parser.statusCode).json(parser);
+      return;
+    }
+
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const body = exception.getResponse();
       const message =
         typeof body === 'string' ? body : ((body as { message?: string | string[] }).message ?? '');
+      if (status === 429) {
+        // Retry-After is already set by the throttler guard.
+        res.status(429).json({
+          statusCode: 429,
+          error: 'TooManyRequests',
+          message: 'Too many requests',
+        });
+        return;
+      }
       res.status(status).json({
         statusCode: status,
         error: exception.name.replace(/Exception$/, ''),

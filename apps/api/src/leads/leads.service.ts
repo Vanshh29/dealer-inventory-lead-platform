@@ -19,6 +19,12 @@ const leadSelect = {
   phone: true,
   message: true,
   status: true,
+  source: true,
+  utmSource: true,
+  utmMedium: true,
+  utmCampaign: true,
+  consentAt: true,
+  firstRespondedAt: true,
   createdAt: true,
   updatedAt: true,
   vehicle: { select: { id: true, make: true, model: true, variant: true, year: true } },
@@ -76,6 +82,11 @@ export class LeadsService {
           email: dto.email.toLowerCase(),
           phone: dto.phone,
           message: dto.message,
+          source: 'WEB',
+          utmSource: dto.utmSource || undefined,
+          utmMedium: dto.utmMedium || undefined,
+          utmCampaign: dto.utmCampaign || undefined,
+          consentAt: new Date(),
         },
         select: { id: true },
       });
@@ -125,7 +136,10 @@ export class LeadsService {
 
   async changeStatus(id: string, to: LeadStatus, actorId: string): Promise<LeadView> {
     await this.prisma.$transaction(async (tx) => {
-      const current = await tx.lead.findUnique({ where: { id }, select: { status: true } });
+      const current = await tx.lead.findUnique({
+        where: { id },
+        select: { status: true, firstRespondedAt: true },
+      });
       if (!current) throw new NotFoundException('Lead not found');
 
       if (!canTransition(current.status, to)) {
@@ -139,7 +153,12 @@ export class LeadsService {
       // Compare-and-set: only applies if nobody changed the status since we read it.
       const res = await tx.lead.updateMany({
         where: { id, status: current.status },
-        data: { status: to },
+        data: {
+          status: to,
+          // Only the first move out of NEW counts as the response.
+          ...(current.status === 'NEW' &&
+            !current.firstRespondedAt && { firstRespondedAt: new Date() }),
+        },
       });
       if (res.count !== 1) {
         throw new ConflictException('Lead was changed by someone else; reload and try again');

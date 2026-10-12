@@ -22,3 +22,8 @@
 - No dashboards or alert rules are shipped; the metrics are there to be scraped.
 - Request ids are not yet forwarded from the web server to the API on server-side fetches.
 - No distributed tracing.
+
+## Ops notes
+
+- No Prometheus configuration ships in this repository (docker-compose has none). When a scraper is added, set `METRICS_TOKEN` on the API and configure the job with `authorization: { type: Bearer, credentials: <same token> }`, or leave the token unset only on a private network.
+- Error shape: an oversized JSON body (over 100 kb) answers 413 `PayloadTooLarge` and malformed JSON 400, both without a Sentry report; throttling answers 429 `TooManyRequests` ("Too many requests") with the `Retry-After` header.

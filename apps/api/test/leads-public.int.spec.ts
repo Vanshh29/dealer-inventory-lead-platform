@@ -13,6 +13,7 @@ describe('Public lead submission', () => {
     email: 'Erika@Example.com',
     phone: '+49 170 1234567',
     message: 'I would like a test drive.',
+    consent: true,
   });
 
   beforeAll(async () => (app = await createApp()));
@@ -31,6 +32,21 @@ describe('Public lead submission', () => {
     expect(lead).toMatchObject({ status: 'NEW', email: 'erika@example.com', vehicleId });
     const audit = await prisma.auditLog.findFirstOrThrow({ where: { entity: 'Lead' } });
     expect(audit).toMatchObject({ action: 'LEAD_CREATED', actorId: null, entityId: lead.id });
+  });
+
+  it('stores source, UTM parameters and the consent timestamp', async () => {
+    await post({ ...valid(), utmSource: 'google', utmMedium: 'cpc', utmCampaign: 'spring' }).expect(
+      201,
+    );
+    const lead = await app.get(PrismaService).lead.findFirstOrThrow();
+    expect(lead).toMatchObject({
+      source: 'WEB',
+      utmSource: 'google',
+      utmMedium: 'cpc',
+      utmCampaign: 'spring',
+      firstRespondedAt: null,
+    });
+    expect(lead.consentAt).toBeInstanceOf(Date);
   });
 
   it('phone is optional', async () => {
@@ -54,6 +70,8 @@ describe('Public lead submission', () => {
     ['missing message', { message: undefined }],
     ['too long message', { message: 'x'.repeat(2001) }],
     ['bad phone', { phone: 'call me maybe' }],
+    ['missing consent', { consent: undefined }],
+    ['consent refused', { consent: false }],
     ['bad vehicleId', { vehicleId: 'abc' }],
     ['status smuggled in', { status: 'WON' }],
     ['assignment smuggled in', { assignedToId: '00000000-0000-4000-8000-000000000000' }],
@@ -88,8 +106,10 @@ describe('Public lead rate limiting', () => {
     const send = () =>
       request(app.getHttpServer())
         .post('/leads')
-        .send({ vehicleId: v.id, name: 'A', email: 'a@example.com', message: 'hi' });
+        .send({ vehicleId: v.id, name: 'A', email: 'a@example.com', message: 'hi', consent: true });
     for (let i = 0; i < 3; i++) await send().expect(201);
-    await send().expect(429);
+    const limited = await send().expect(429);
+    expect(limited.body).toMatchObject({ error: 'TooManyRequests', message: 'Too many requests' });
+    expect(limited.headers['retry-after']).toBeDefined();
   });
 });

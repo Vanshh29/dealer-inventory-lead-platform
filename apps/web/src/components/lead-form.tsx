@@ -9,6 +9,7 @@ export interface LeadFormValues {
   email: string;
   phone: string;
   message: string;
+  consent: boolean;
 }
 type Errors = Partial<Record<keyof LeadFormValues, string>>;
 
@@ -24,7 +25,19 @@ export function validateLead(v: LeadFormValues): Errors {
   if (v.phone.trim() && !PHONE.test(v.phone.trim())) e.phone = 'Please enter a valid phone number.';
   if (!v.message.trim()) e.message = 'Please write a short message.';
   else if (v.message.trim().length > 2000) e.message = 'Message must be 2000 characters or fewer.';
+  if (!v.consent) e.consent = 'Please agree to the privacy notice to send your request.';
   return e;
+}
+
+/** Campaign parameters from the landing URL, trimmed and capped to the API's 100 characters. */
+export function readUtm(search: string) {
+  const p = new URLSearchParams(search);
+  const get = (k: string) => p.get(k)?.trim().slice(0, 100) || undefined;
+  return {
+    utmSource: get('utm_source'),
+    utmMedium: get('utm_medium'),
+    utmCampaign: get('utm_campaign'),
+  };
 }
 
 export function LeadForm({ vehicleId, vehicleTitle }: { vehicleId: string; vehicleTitle: string }) {
@@ -35,12 +48,13 @@ export function LeadForm({ vehicleId, vehicleTitle }: { vehicleId: string; vehic
     email: '',
     phone: '',
     message: `Hello, I am interested in the ${vehicleTitle}. Is it still available?`,
+    consent: false,
   });
   const [errors, setErrors] = useState<Errors>({});
   const [state, setState] = useState<'idle' | 'submitting' | 'sent'>('idle');
   const [failure, setFailure] = useState<string | null>(null);
 
-  const set = (k: keyof LeadFormValues) => (e: { target: { value: string } }) =>
+  const set = (k: Exclude<keyof LeadFormValues, 'consent'>) => (e: { target: { value: string } }) =>
     setValues((v) => ({ ...v, [k]: e.target.value }));
 
   async function onSubmit(e: FormEvent) {
@@ -64,6 +78,8 @@ export function LeadForm({ vehicleId, vehicleTitle }: { vehicleId: string; vehic
         email: values.email.trim(),
         phone: values.phone.trim() || undefined,
         message: values.message.trim(),
+        consent: true,
+        ...readUtm(window.location.search),
         website,
       });
       setState('sent');
@@ -168,7 +184,32 @@ export function LeadForm({ vehicleId, vehicleTitle }: { vehicleId: string; vehic
         </label>
       </div>
 
-      <p className="text-xs text-slate-600">We only use your details to answer this request.</p>
+      <div>
+        <label className="flex items-start gap-2 text-sm text-slate-800">
+          <input
+            type="checkbox"
+            name="consent"
+            checked={values.consent}
+            onChange={(e) => setValues((v) => ({ ...v, consent: e.target.checked }))}
+            aria-invalid={Boolean(errors.consent)}
+            aria-describedby={`${uid}-consent-note${errors.consent ? ` ${uid}-consent-error` : ''}`}
+            className="mt-0.5 h-4 w-4 shrink-0"
+            required
+          />
+          <span>I agree that my details may be stored and used to answer this request.</span>
+        </label>
+        {errors.consent && (
+          <p id={`${uid}-consent-error`} className="mt-1 text-xs font-medium text-red-700">
+            {errors.consent}
+          </p>
+        )}
+        <p id={`${uid}-consent-note`} className="mt-1 text-xs text-slate-600">
+          Privacy notice: we use your name, email, phone number and message only to reply to this
+          enquiry and do not pass them on to third parties. You can ask us to delete them at any
+          time.
+        </p>
+      </div>
+      <p className="text-xs text-slate-600">We reply within one business day.</p>
       <Button type="submit" disabled={state === 'submitting'}>
         {state === 'submitting' ? 'Sending…' : 'Send request'}
       </Button>

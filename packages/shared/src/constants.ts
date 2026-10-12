@@ -7,6 +7,9 @@ export type VehicleStatus = (typeof VEHICLE_STATUSES)[number];
 export const LEAD_STATUSES = ['NEW', 'CONTACTED', 'TEST_DRIVE', 'OFFER', 'WON', 'LOST'] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
 
+export const LEAD_SOURCES = ['WEB', 'PHONE', 'MARKETPLACE', 'OTHER'] as const;
+export type LeadSource = (typeof LEAD_SOURCES)[number];
+
 /** Money is always integer cents; never floats. */
 export function formatEuro(cents: number): string {
   if (!Number.isInteger(cents)) throw new Error('Price must be integer cents');

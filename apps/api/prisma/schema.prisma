@@ -110,27 +110,43 @@ enum LeadStatus {
   LOST
 }
 
+enum LeadSource {
+  WEB
+  PHONE
+  MARKETPLACE
+  OTHER
+}
+
 // A customer enquiry. Personal data: keep it minimal (see docs/decisions/0004).
 model Lead {
-  id           String     @id @default(uuid())
+  id               String     @id @default(uuid())
   // Nullable + SetNull: deleting a vehicle must not destroy the sales history of its leads.
-  vehicleId    String?
-  vehicle      Vehicle?   @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
-  name         String
-  email        String
-  phone        String?
-  message      String
-  status       LeadStatus @default(NEW)
-  assignedToId String?
-  assignedTo   User?      @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: SetNull)
-  notes        LeadNote[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  vehicleId        String?
+  vehicle          Vehicle?   @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  name             String
+  email            String
+  phone            String?
+  message          String
+  status           LeadStatus @default(NEW)
+  source           LeadSource @default(WEB)
+  utmSource        String?
+  utmMedium        String?
+  utmCampaign      String?
+  // When the visitor ticked the privacy consent box (set on public submissions).
+  consentAt        DateTime?
+  // First time the lead left NEW; basis for response-time statistics.
+  firstRespondedAt DateTime?
+  assignedToId     String?
+  assignedTo       User?      @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: SetNull)
+  notes            LeadNote[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 
   @@index([status, createdAt])
   @@index([assignedToId, status])
   @@index([vehicleId])
   @@index([createdAt])
+  @@index([firstRespondedAt])
 }
 
 model LeadNote {

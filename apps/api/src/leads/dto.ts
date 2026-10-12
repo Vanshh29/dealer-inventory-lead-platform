@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import {
+  Equals,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -41,6 +42,28 @@ export class CreateLeadDto {
   @IsNotEmpty()
   @MaxLength(2000)
   message!: string;
+
+  /** Explicit agreement to the privacy notice; recorded as `consentAt`. */
+  @Equals(true, { message: 'consent must be given' })
+  consent!: true;
+
+  @IsOptional()
+  @Transform(trim)
+  @IsString()
+  @MaxLength(100)
+  utmSource?: string;
+
+  @IsOptional()
+  @Transform(trim)
+  @IsString()
+  @MaxLength(100)
+  utmMedium?: string;
+
+  @IsOptional()
+  @Transform(trim)
+  @IsString()
+  @MaxLength(100)
+  utmCampaign?: string;
 
   /**
    * Honeypot. Hidden from humans in the form; bots fill every field. If it has a value the

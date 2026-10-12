@@ -35,7 +35,11 @@ export function LoginForm() {
     } catch (err) {
       // Same message for unknown email and wrong password, like the API.
       setError(
-        isApiError(err) && err.isUnauthorized ? 'Invalid email or password.' : describeError(err),
+        isApiError(err) && err.isUnauthorized
+          ? 'Invalid email or password.'
+          : isApiError(err) && err.isRateLimited
+            ? 'Too many attempts. Please wait a minute and try again.'
+            : describeError(err),
       );
       setBusy(false);
     }

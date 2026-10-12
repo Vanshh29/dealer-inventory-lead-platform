@@ -1,3 +1,4 @@
+import { invertedRanges } from '@dealer/shared';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Page } from '../common/pagination';
@@ -37,20 +38,8 @@ export class CatalogService {
   constructor(private readonly prisma: PrismaService) {}
 
   async search(query: CatalogQuery): Promise<Page<VehicleWithImages>> {
-    if (
-      query.priceMin !== undefined &&
-      query.priceMax !== undefined &&
-      query.priceMin > query.priceMax
-    ) {
-      throw new BadRequestException('priceMin must not exceed priceMax');
-    }
-    if (
-      query.yearMin !== undefined &&
-      query.yearMax !== undefined &&
-      query.yearMin > query.yearMax
-    ) {
-      throw new BadRequestException('yearMin must not exceed yearMax');
-    }
+    const inverted = invertedRanges(query);
+    if (inverted.length > 0) throw new BadRequestException(inverted.join('; '));
     const tsq = query.q ? toTsQuery(query.q) : null;
     return tsq ? this.fullText(query, tsq) : this.filtered(query);
   }

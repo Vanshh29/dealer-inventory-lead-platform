@@ -1,4 +1,5 @@
-import { apiErrorSchema, leadSchema, pageSchema, vehicleSchema } from './api-schemas';
+import { apiErrorSchema, leadSchema, pageSchema, statsSchema, vehicleSchema } from './api-schemas';
+import { LEAD_SOURCES, LEAD_STATUSES, VEHICLE_STATUSES } from './constants';
 
 const vehicle = {
   id: 'v1',
@@ -46,5 +47,22 @@ describe('api schemas', () => {
       }).success,
     ).toBe(true);
     expect(leadSchema.safeParse({ id: 1 }).success).toBe(false);
+  });
+});
+
+describe('statsSchema (response metrics)', () => {
+  const counts = (keys: readonly string[]) => Object.fromEntries(keys.map((k) => [k, 0]));
+  const base = {
+    leads: counts(LEAD_STATUSES),
+    vehicles: counts(VEHICLE_STATUSES),
+    firstResponse: { averageHours: null, medianHours: null, sampleSize: 0 },
+    overdueLeads: 0,
+    leadsBySource: counts(LEAD_SOURCES),
+  };
+  it('accepts empty metrics', () => expect(statsSchema.safeParse(base).success).toBe(true));
+  it('requires every lead source', () => {
+    const partial: Record<string, number> = { ...base.leadsBySource };
+    delete partial.WEB;
+    expect(statsSchema.safeParse({ ...base, leadsBySource: partial }).success).toBe(false);
   });
 });

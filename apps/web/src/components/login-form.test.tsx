@@ -62,7 +62,11 @@ describe('LoginForm', () => {
     login.mockRejectedValue(new ApiError(429, null));
     render(<LoginForm />);
     await submit();
-    expect(await screen.findByRole('alert')).toHaveTextContent(/Too many requests/);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Too many attempts. Please wait a minute and try again.',
+    );
+    expect(replace).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeEnabled();
   });
 
   it('skips the form when already signed in', () => {

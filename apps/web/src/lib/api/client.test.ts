@@ -33,6 +33,15 @@ function client(respond: (url: URL, init: RequestInit) => Response) {
   });
   return { api, calls };
 }
+const leadExtras = {
+  source: 'WEB',
+  utmSource: null,
+  utmMedium: null,
+  utmCampaign: null,
+  consentAt: null,
+  firstRespondedAt: null,
+};
+
 const ok = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
@@ -71,7 +80,13 @@ describe('api client', () => {
 
   it('leads.submit always sends the honeypot field empty', async () => {
     const { api, calls } = client(() => ok({ received: true }, 201));
-    await api.leads.submit({ vehicleId: 'v1', name: 'A', email: 'a@b.de', message: 'hi' });
+    await api.leads.submit({
+      vehicleId: 'v1',
+      name: 'A',
+      email: 'a@b.de',
+      message: 'hi',
+      consent: true,
+    });
     expect(JSON.parse(calls[0].init.body as string)).toMatchObject({ website: '' });
   });
 
@@ -83,6 +98,7 @@ describe('api client', () => {
       phone: null,
       message: 'm',
       status: 'CONTACTED',
+      ...leadExtras,
       createdAt: 'x',
       updatedAt: 'x',
       vehicle: null,
@@ -106,6 +122,7 @@ describe('api client', () => {
         phone: null,
         message: 'm',
         status: 'NEW',
+        ...leadExtras,
         createdAt: 'x',
         updatedAt: 'x',
         vehicle: null,

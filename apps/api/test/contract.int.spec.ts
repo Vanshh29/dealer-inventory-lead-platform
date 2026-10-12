@@ -166,6 +166,7 @@ describe('API response contracts (shared zod schemas)', () => {
       const stats = statsSchema.parse(res.body);
       expect(Object.keys(stats.leads)).toHaveLength(6);
       expect(Object.keys(stats.vehicles)).toHaveLength(4);
+      expect(Object.keys(stats.leadsBySource)).toHaveLength(4);
     }
     await request(app.getHttpServer()).get('/admin/stats').expect(401);
   });

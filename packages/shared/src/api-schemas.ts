@@ -3,6 +3,7 @@ import {
   CATALOG_SORTS,
   FUEL_TYPES,
   GEARBOXES,
+  LEAD_SOURCES,
   LEAD_STATUSES,
   ROLES,
   VEHICLE_STATUSES,
@@ -84,6 +85,14 @@ export const leadSchema = z.object({
   phone: z.string().nullable(),
   message: z.string(),
   status: z.enum(LEAD_STATUSES),
+  source: z.enum(LEAD_SOURCES),
+  utmSource: z.string().nullable(),
+  utmMedium: z.string().nullable(),
+  utmCampaign: z.string().nullable(),
+  /** null for leads created before consent was recorded, or entered by staff. */
+  consentAt: z.string().nullable(),
+  /** First time the lead left NEW; null while untouched. */
+  firstRespondedAt: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
   /** null when the vehicle was deleted after the lead came in. */
@@ -147,6 +156,20 @@ export const statsSchema = z.object({
       z.ZodNumber
     >,
   ),
+  /** Hours from lead creation to first status change, for leads answered in the last 30 days. */
+  firstResponse: z.object({
+    averageHours: z.number().nullable(),
+    medianHours: z.number().nullable(),
+    sampleSize: z.number().int().min(0),
+  }),
+  /** NEW leads that have waited longer than 24 hours. */
+  overdueLeads: z.number().int().min(0),
+  leadsBySource: z.object(
+    Object.fromEntries(LEAD_SOURCES.map((s) => [s, z.number().int()])) as Record<
+      (typeof LEAD_SOURCES)[number],
+      z.ZodNumber
+    >,
+  ),
 });
 export type Stats = z.infer<typeof statsSchema>;
 
@@ -192,6 +215,11 @@ export interface LeadInput {
   email: string;
   phone?: string;
   message: string;
+  /** The visitor must explicitly agree to the privacy notice. */
+  consent: true;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
   /** Honeypot: always send an empty string (or omit). Real users never see this field. */
   website?: string;
 }

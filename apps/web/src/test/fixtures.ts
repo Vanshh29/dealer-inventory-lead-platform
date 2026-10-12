@@ -36,6 +36,12 @@ export const lead = (o: Partial<Lead> = {}): Lead => ({
   phone: '+49 170 1234567',
   message: 'Still available?',
   status: 'NEW',
+  source: 'WEB',
+  utmSource: null,
+  utmMedium: null,
+  utmCampaign: null,
+  consentAt: '2026-06-01T10:00:00.000Z',
+  firstRespondedAt: null,
   createdAt: '2026-06-01T10:00:00.000Z',
   updatedAt: '2026-06-01T10:00:00.000Z',
   vehicle: {
