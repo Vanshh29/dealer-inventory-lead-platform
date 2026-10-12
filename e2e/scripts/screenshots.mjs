@@ -27,7 +27,7 @@ await shot('vehicle-detail', true);
 
 await page.goto(`${base}/admin/login`);
 await shot('login');
-await page.getByLabel(/email/i).fill('sales@dealer.test');
+await page.getByLabel(/email/i).fill('sales@carvio.test');
 await page.getByLabel(/password/i).fill('Passw0rd!Passw0rd!');
 await page.getByRole('button', { name: /sign in|log in/i }).click();
 await page.waitForURL(/\/admin(?!\/login)/);

@@ -10,7 +10,7 @@ const customer = { name: `E2E Customer ${stamp}`, email: `e2e.${stamp}@example.c
 // Self-cleaning: remove vehicles this suite creates, even when a run failed half way.
 test.afterAll(async () => {
   const api = await apiRequest.newContext({ baseURL: API_URL });
-  await api.post('/auth/login', { data: { email: 'admin@dealer.test', password: PASSWORD } });
+  await api.post('/auth/login', { data: { email: 'admin@carvio.test', password: PASSWORD } });
   const found = await (await api.get('/vehicles', { params: { q: 'E2E Octavia' } })).json();
   for (const v of found.items) await api.delete(`/admin/vehicles/${v.id}`);
   await api.dispose();
@@ -94,7 +94,7 @@ test.describe('back office', () => {
     await page.goto('/admin/leads');
     await expect(page).toHaveURL(/\/admin\/login\?next=%2Fadmin%2Fleads/);
 
-    await login(page, 'sales@dealer.test', 'wrong-password!!', { expectSuccess: false });
+    await login(page, 'sales@carvio.test', 'wrong-password!!', { expectSuccess: false });
     await expect(page.getByRole('alert').filter({ hasText: 'Invalid' })).toHaveText(
       'Invalid email or password.',
     );
@@ -102,7 +102,7 @@ test.describe('back office', () => {
   });
 
   test('sales works the new lead through the pipeline', async ({ page }) => {
-    await login(page, 'sales@dealer.test');
+    await login(page, 'sales@carvio.test');
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
     await expect(page.getByText('SALES', { exact: true })).toBeVisible();
 
@@ -124,7 +124,7 @@ test.describe('back office', () => {
     await expect(page.getByRole('button', { name: 'Mark as Contacted' })).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Assign to me' }).click();
-    await expect(page.getByText('sales@dealer.test').first()).toBeVisible();
+    await expect(page.getByText('sales@carvio.test').first()).toBeVisible();
 
     await page.getByLabel('Add a note').fill('Called the customer, test drive on Saturday.');
     await page.getByRole('button', { name: 'Add note' }).click();
@@ -145,7 +145,7 @@ test.describe('back office', () => {
   });
 
   test('admin sees the audit history of that lead', async ({ page }) => {
-    await login(page, 'admin@dealer.test');
+    await login(page, 'admin@carvio.test');
     await page.goto(`/admin/leads?q=${encodeURIComponent(customer.email)}`);
     await page.getByRole('link', { name: customer.name }).click();
     const history = page.getByRole('region', { name: 'History' });
@@ -156,7 +156,7 @@ test.describe('back office', () => {
 
   test('viewer is read-only: no actions on leads, no "Add vehicle"', async ({ page, watch }) => {
     watch.allow(/^40[13] POST .*\/admin\/vehicles$/); // direct API call that must be refused
-    await login(page, 'viewer@dealer.test');
+    await login(page, 'viewer@carvio.test');
     await page.goto(`/admin/leads?q=${encodeURIComponent(customer.email)}`);
     await page.getByRole('link', { name: customer.name }).click();
     await expect(page.getByText(/read-only access/)).toBeVisible();
@@ -173,7 +173,7 @@ test.describe('back office', () => {
   });
 
   test('admin creates, edits, photographs and deletes a vehicle', async ({ page }) => {
-    await login(page, 'admin@dealer.test');
+    await login(page, 'admin@carvio.test');
     await page.getByRole('link', { name: 'Vehicles' }).click();
     await page.getByRole('link', { name: 'Add vehicle' }).click();
 
@@ -227,7 +227,7 @@ test.describe('back office', () => {
   });
 
   test('logging out ends the session', async ({ page }) => {
-    await login(page, 'sales@dealer.test');
+    await login(page, 'sales@carvio.test');
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
     await page.getByRole('button', { name: 'Log out' }).click();
     await expect(page).toHaveURL(/\/admin\/login/);

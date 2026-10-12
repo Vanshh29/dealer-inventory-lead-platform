@@ -1,6 +1,6 @@
-# Dealer Inventory & Lead Platform
+# Carvio
 
-A used-car dealer platform: a public catalog with full-text search, lead capture, and a role-based back office to work the lead pipeline. TypeScript end to end: Next.js, NestJS, PostgreSQL + Prisma, REST (OpenAPI) and a read-only GraphQL layer, Docker, GitHub Actions.
+**Dealer inventory and lead platform.** A public catalog with full-text search, lead capture, and a role-based back office to work the lead pipeline. TypeScript end to end: Next.js, NestJS, PostgreSQL + Prisma, REST (OpenAPI) and a read-only GraphQL layer, Docker, GitHub Actions.
 
 ![Home page](docs/screenshots/home.png)
 
@@ -53,7 +53,7 @@ docker compose up --build
 - GraphQL (read-only catalog, `POST`): http://localhost:4000/graphql, see `docs/architecture.md` for an example
 - Staff back office: http://localhost:3000/admin (demo logins below)
 
-The API applies migrations on start. Seed demo data: three users (admin/sales/viewer `@dealer.test`, password `Passw0rd!Passw0rd!`, local use only) 240 vehicles (`SEED_VEHICLES=n`) and 40 demo leads (`SEED_LEADS=n`). Safe to run repeatedly:
+The API applies migrations on start. Seed demo data: three users (admin/sales/viewer `@carvio.test`, password `Passw0rd!Passw0rd!`, local use only) 240 vehicles (`SEED_VEHICLES=n`) and 40 demo leads (`SEED_LEADS=n`). Safe to run repeatedly:
 
 ```bash
 docker compose exec api ./node_modules/.bin/tsx prisma/seed.ts
@@ -88,7 +88,7 @@ Create the test database once: `docker compose exec db psql -U dealer -d dealer 
 
 ```bash
 curl 'http://localhost:4000/vehicles?q=golf&fuel=DIESEL&sort=price_asc&limit=5'
-curl -c jar -H 'content-type: application/json' -d '{"email":"admin@dealer.test","password":"Passw0rd!Passw0rd!"}' http://localhost:4000/auth/login
+curl -c jar -H 'content-type: application/json' -d '{"email":"admin@carvio.test","password":"Passw0rd!Passw0rd!"}' http://localhost:4000/auth/login
 curl -b jar http://localhost:4000/admin/vehicles?status=DRAFT
 # submit a lead (public), then work it as sales
 curl -H 'content-type: application/json' -d '{"vehicleId":"<id of a published vehicle>","name":"Erika","email":"e@example.com","message":"Still available?"}' http://localhost:4000/leads
@@ -101,7 +101,7 @@ Search performance numbers (measured, with caveats): `docs/architecture.md`.
 ## Using the site
 
 - **Public:** `/` search and latest cars · `/vehicles` catalog with filters, sorting and pagination (state is in the URL) · `/vehicles/<id>` photos, specs and the enquiry form.
-- **Back office** (`/admin`, log in with `admin@dealer.test`, `sales@dealer.test` or `viewer@dealer.test`, password `Passw0rd!Passw0rd!`): dashboard with pipeline counts · **Leads** table (filter by status, search, open a lead to change status, assign, add notes; admins also see its history) · **Vehicles** (create, edit, photos, delete: admin only).
+- **Back office** (`/admin`, log in with `admin@carvio.test`, `sales@carvio.test` or `viewer@carvio.test`, password `Passw0rd!Passw0rd!`): dashboard with pipeline counts · **Leads** table (filter by status, search, open a lead to change status, assign, add notes; admins also see its history) · **Vehicles** (create, edit, photos, delete: admin only).
 - Roles: ADMIN everything · SALES works leads and notes, reads vehicles · VIEWER read-only. The server enforces this; the UI only hides what you cannot do.
 
 ## Browser tests (Playwright)

@@ -55,7 +55,7 @@ describe('ConsoleShell', () => {
   it('shows navigation, the user and role, and marks the current page', async () => {
     session = {
       status: 'authenticated',
-      user: { id: '1', email: 'sales@dealer.test', role: 'SALES' },
+      user: { id: '1', email: 'sales@carvio.test', role: 'SALES' },
     };
     render(
       <ConsoleShell>
@@ -63,7 +63,7 @@ describe('ConsoleShell', () => {
       </ConsoleShell>,
     );
     expect(screen.getByText('secret page')).toBeInTheDocument();
-    expect(screen.getByText('sales@dealer.test')).toBeInTheDocument();
+    expect(screen.getByText('sales@carvio.test')).toBeInTheDocument();
     expect(screen.getByText('SALES')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Leads' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');

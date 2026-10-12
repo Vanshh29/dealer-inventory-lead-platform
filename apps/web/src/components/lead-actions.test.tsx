@@ -67,10 +67,10 @@ describe('LeadStatusActions', () => {
 });
 
 describe('LeadAssignment', () => {
-  const me: AuthUser = { id: 'me', email: 'sales@dealer.test', role: 'SALES' };
+  const me: AuthUser = { id: 'me', email: 'sales@carvio.test', role: 'SALES' };
   const users: User[] = [
-    { id: 'me', email: 'sales@dealer.test', role: 'SALES', createdAt: '' },
-    { id: 'boss', email: 'admin@dealer.test', role: 'ADMIN', createdAt: '' },
+    { id: 'me', email: 'sales@carvio.test', role: 'SALES', createdAt: '' },
+    { id: 'boss', email: 'admin@carvio.test', role: 'ADMIN', createdAt: '' },
   ];
 
   it('lets SALES assign to themselves or unassign', async () => {
@@ -117,14 +117,14 @@ describe('LeadAssignment', () => {
   it('is read-only for viewers', () => {
     render(
       <LeadAssignment
-        lead={lead({ assignedTo: { id: 'x', email: 'x@dealer.test', role: 'SALES' } })}
+        lead={lead({ assignedTo: { id: 'x', email: 'x@carvio.test', role: 'SALES' } })}
         me={{ ...me, role: 'VIEWER' }}
         canEdit={false}
         busy={false}
         onAssign={jest.fn()}
       />,
     );
-    expect(screen.getByText('x@dealer.test')).toBeInTheDocument();
+    expect(screen.getByText('x@carvio.test')).toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });

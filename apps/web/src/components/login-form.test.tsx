@@ -23,7 +23,7 @@ beforeEach(() => {
   sessionStatus = 'anonymous';
 });
 
-const submit = async (email = 'admin@dealer.test', pw = 'secret-pass') => {
+const submit = async (email = 'admin@carvio.test', pw = 'secret-pass') => {
   const user = userEvent.setup();
   await user.type(screen.getByLabelText('Email'), email);
   await user.type(screen.getByLabelText('Password'), pw);
@@ -32,10 +32,10 @@ const submit = async (email = 'admin@dealer.test', pw = 'secret-pass') => {
 
 describe('LoginForm', () => {
   it('logs in and goes to the back office', async () => {
-    login.mockResolvedValue({ id: '1', email: 'admin@dealer.test', role: 'ADMIN' });
+    login.mockResolvedValue({ id: '1', email: 'admin@carvio.test', role: 'ADMIN' });
     render(<LoginForm />);
     await submit();
-    expect(login).toHaveBeenCalledWith('admin@dealer.test', 'secret-pass');
+    expect(login).toHaveBeenCalledWith('admin@carvio.test', 'secret-pass');
     await waitFor(() => expect(replace).toHaveBeenCalledWith('/admin'));
   });
 

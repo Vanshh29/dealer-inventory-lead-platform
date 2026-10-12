@@ -8,9 +8,9 @@ const prisma = new PrismaClient();
 const password = process.env.SEED_PASSWORD ?? 'Passw0rd!Passw0rd!';
 
 const users: { email: string; role: Role }[] = [
-  { email: 'admin@dealer.test', role: 'ADMIN' },
-  { email: 'sales@dealer.test', role: 'SALES' },
-  { email: 'viewer@dealer.test', role: 'VIEWER' },
+  { email: 'admin@carvio.test', role: 'ADMIN' },
+  { email: 'sales@carvio.test', role: 'SALES' },
+  { email: 'viewer@carvio.test', role: 'VIEWER' },
 ];
 
 async function main(): Promise<void> {
@@ -38,7 +38,7 @@ async function main(): Promise<void> {
   }
   console.log(`Seeded ${count} vehicles with ${images.length} images (idempotent).`);
 
-  const sales = await prisma.user.findUniqueOrThrow({ where: { email: 'sales@dealer.test' } });
+  const sales = await prisma.user.findUniqueOrThrow({ where: { email: 'sales@carvio.test' } });
   const { leads, notes } = generateLeads(vehicles, Number(process.env.SEED_LEADS ?? 40), sales.id);
   await prisma.lead.createMany({ data: leads, skipDuplicates: true });
   await prisma.leadNote.createMany({ data: notes, skipDuplicates: true });

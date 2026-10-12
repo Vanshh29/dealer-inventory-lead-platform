@@ -60,7 +60,7 @@ test.describe('phone layout', () => {
   });
 
   test('back office tables show the important columns on a phone', async ({ page }) => {
-    await login(page, 'sales@dealer.test');
+    await login(page, 'sales@carvio.test');
     await page.goto('/admin/leads');
     const table = page.getByRole('table');
     await expect(table).toBeVisible();

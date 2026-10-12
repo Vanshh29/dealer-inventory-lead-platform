@@ -27,7 +27,7 @@ describe('LeadsView', () => {
           id: 'l2',
           name: 'Max Muster',
           status: 'CONTACTED',
-          assignedTo: { id: 'u', email: 'sales@dealer.test', role: 'SALES' },
+          assignedTo: { id: 'u', email: 'sales@carvio.test', role: 'SALES' },
         }),
       ]),
     );
@@ -43,7 +43,7 @@ describe('LeadsView', () => {
     );
     expect(within(rows[1]).getByText('New')).toBeInTheDocument();
     expect(within(rows[2]).getByText('Contacted')).toBeInTheDocument();
-    expect(within(rows[2]).getByText('sales@dealer.test')).toBeInTheDocument();
+    expect(within(rows[2]).getByText('sales@carvio.test')).toBeInTheDocument();
     expect(screen.getByText('2 leads')).toBeInTheDocument();
   });
 

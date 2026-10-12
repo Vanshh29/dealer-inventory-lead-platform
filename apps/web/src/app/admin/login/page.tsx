@@ -32,8 +32,8 @@ export default function LoginPage() {
           <LoginForm />
         </Suspense>
         <p className="mt-6 rounded-xl bg-slate-50 p-3 text-xs text-slate-700">
-          <span className="font-semibold">Demo accounts (local seed):</span> admin@dealer.test,
-          sales@dealer.test, viewer@dealer.test
+          <span className="font-semibold">Try the staff accounts:</span> admin@carvio.test,
+          sales@carvio.test, viewer@carvio.test
         </p>
       </div>
     </div>

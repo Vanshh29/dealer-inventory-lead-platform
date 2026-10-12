@@ -58,7 +58,7 @@ test.describe('accessibility (axe)', () => {
     await page.goto('/admin/login');
     expect(await violations(page), 'login').toEqual([]);
 
-    await login(page, 'admin@dealer.test');
+    await login(page, 'admin@carvio.test');
     await page.getByRole('heading', { name: 'Dashboard' }).waitFor();
     expect(await violations(page), 'dashboard').toEqual([]);
 

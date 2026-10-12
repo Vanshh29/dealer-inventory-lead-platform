@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SiteHeader } from '@/components/site-header';
+import { SITE_URL } from '@/lib/site-url';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: { default: 'Autohaus Demo – Used cars', template: '%s · Autohaus Demo' },
-  description: 'Quality used cars with transparent pricing.',
+  metadataBase: new URL(SITE_URL),
+  title: { default: 'Carvio – Quality used cars', template: '%s · Carvio' },
+  description: 'Inspected used cars with transparent pricing and a straightforward buying process.',
+  openGraph: { siteName: 'Carvio', type: 'website' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -26,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 text-sm text-slate-700 sm:grid-cols-3">
             <div>
               <p className="text-base font-bold text-slate-900">
-                Autohaus <span className="text-gradient">Demo</span>
+                Carvio<span className="text-gradient">.</span>
               </p>
               <p className="mt-2 max-w-xs">
                 Quality used cars with transparent pricing and a straightforward buying process.
@@ -58,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div>
               <p className="font-semibold text-slate-900">About this site</p>
               <p className="mt-2">
-                Portfolio demo project. All vehicles, photos and people are fictional.
+                Carvio is a portfolio project. All vehicles, photos and people are fictional.
               </p>
             </div>
           </div>
