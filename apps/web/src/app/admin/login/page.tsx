@@ -8,7 +8,7 @@ export default function LoginPage() {
     <div className="mx-auto grid max-w-4xl overflow-hidden glass-strong rounded-3xl shadow-lift md:grid-cols-2">
       <div
         aria-hidden="true"
-        className="relative hidden bg-gradient-to-br from-slate-950 via-blue-950 to-blue-800 p-8 text-white md:flex md:flex-col md:justify-between"
+        className="relative hidden bg-gradient-to-br from-slate-950 via-blue-950 to-blue-800 p-8 text-white md:flex md:flex-col md:justify-between md:gap-10"
       >
         <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25">
           <CarIcon className="h-6 w-6" />

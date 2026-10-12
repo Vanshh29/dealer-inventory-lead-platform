@@ -3,7 +3,7 @@
 import { useId, useState } from 'react';
 import type { Vehicle } from '@dealer/shared';
 import { api, assetUrl, describeError } from '@/lib/api';
-import { Button } from './ui';
+import { TrashIcon } from './icons';
 
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 export const MAX_IMAGES = 10;
@@ -28,6 +28,7 @@ export function VehicleImages({
   const inputId = useId();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [broken, setBroken] = useState<Set<string>>(new Set());
 
   async function upload(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -82,24 +83,33 @@ export function VehicleImages({
       )}
       <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
         {vehicle.images.map((img, i) => (
-          <li key={img.id} className="overflow-hidden rounded-md border border-slate-200">
-            <img
-              src={assetUrl(img.url)}
-              alt={`Photo ${i + 1}`}
-              className="aspect-[4/3] w-full object-cover"
-            />
-            <div className="flex items-center justify-between p-2 text-xs text-slate-700">
-              <span>{i === 0 ? 'Cover' : `#${i + 1}`}</span>
+          <li key={img.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="relative aspect-[4/3] bg-slate-100">
+              {broken.has(img.id) ? (
+                <div className="flex h-full items-center justify-center p-2 text-center text-xs text-slate-700">
+                  Image unavailable
+                </div>
+              ) : (
+                <img
+                  src={assetUrl(img.url)}
+                  alt={`Photo ${i + 1}`}
+                  onError={() => setBroken((prev) => new Set(prev).add(img.id))}
+                  className="h-full w-full object-cover"
+                />
+              )}
+              <span className="absolute left-2 top-2 rounded-full bg-slate-900/85 px-2.5 py-1 text-xs font-semibold text-white">
+                {i === 0 ? 'Cover' : `#${i + 1}`}
+              </span>
               {canEdit && (
-                <Button
-                  variant="ghost"
-                  className="!px-2 !py-1 text-red-800"
+                <button
+                  type="button"
                   disabled={busy}
                   onClick={() => void remove(img.id)}
                   aria-label={`Delete photo ${i + 1}`}
+                  className="absolute right-1 top-1 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-red-800 shadow-sm transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Delete
-                </Button>
+                  <TrashIcon className="h-5 w-5" />
+                </button>
               )}
             </div>
           </li>

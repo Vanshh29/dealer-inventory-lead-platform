@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { LEAD_STATUSES } from '@dealer/shared';
 import type { Lead, LeadStatus } from '@dealer/shared';
 import { api, describeError } from '@/lib/api';
-import { formatDate, LEAD_STATUS_LABEL, vehicleTitle } from '@/lib/format';
+import { formatDateTime, LEAD_STATUS_LABEL, vehicleTitle } from '@/lib/format';
 import { useRemote } from '@/lib/use-remote';
 import { LeadStatusBadge } from './badges';
 import { buttonClass, EmptyState, ErrorState, inputClass, Pagination } from './ui';
@@ -40,18 +40,23 @@ export function LeadsTable({ items }: { items: Lead[] }) {
           {items.map((lead) => (
             <tr key={lead.id} className="transition-colors hover:bg-blue-50/50">
               <td className="hidden whitespace-nowrap px-4 py-3 text-slate-700 md:table-cell">
-                {formatDate(lead.createdAt)}
+                {formatDateTime(lead.createdAt)}
               </td>
-              <th scope="row" className="px-4 py-3 font-normal">
+              <th scope="row" className="min-w-[11rem] px-4 py-3 font-normal">
                 <Link
                   href={`/admin/leads/${lead.id}`}
                   className="font-medium text-blue-800 hover:underline"
                 >
                   {lead.name}
                 </Link>
-                <span className="block break-all text-slate-600">{lead.email}</span>
+                <span
+                  title={lead.email}
+                  className="block max-w-[14rem] truncate text-slate-600 sm:max-w-[22rem]"
+                >
+                  {lead.email}
+                </span>
                 <span className="mt-0.5 block text-xs text-slate-600 md:hidden">
-                  {formatDate(lead.createdAt)}
+                  {formatDateTime(lead.createdAt)}
                   {lead.vehicle && ` · ${vehicleTitle(lead.vehicle)}`}
                 </span>
               </th>

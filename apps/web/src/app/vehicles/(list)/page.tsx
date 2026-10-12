@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { api, describeError } from '@/lib/api';
 import { catalogRevalidate, facetsRevalidate } from '@/lib/cache';
 import { catalogHref, parseCatalogSearch, type RawSearchParams } from '@/lib/catalog-params';
-import { CatalogFilters } from '@/components/catalog-filters';
+import { ActiveFilters, CatalogFilters } from '@/components/catalog-filters';
 import { FilterDrawer } from '@/components/filter-drawer';
 import { VehicleGrid } from '@/components/vehicle-card';
 import { EmptyState, ErrorState, LinkButton, Pagination } from '@/components/ui';
@@ -52,6 +52,7 @@ export default async function CatalogPage({
             <p className="mt-1 text-slate-700" aria-live="polite">
               {result.value.total} {result.value.total === 1 ? 'car' : 'cars'} found
             </p>
+            <ActiveFilters state={state} />
             {result.value.items.length === 0 ? (
               <div className="mt-6">
                 <EmptyState title="No cars match your search">
@@ -65,6 +66,7 @@ export default async function CatalogPage({
               </div>
             ) : (
               <div className="mt-4">
+                <h2 className="sr-only">Results</h2>
                 <VehicleGrid vehicles={result.value.items} />
                 <Pagination
                   page={result.value.page}

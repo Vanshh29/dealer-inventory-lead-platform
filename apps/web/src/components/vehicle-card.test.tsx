@@ -11,7 +11,9 @@ describe('VehicleCard', () => {
     );
     expect(screen.getByRole('heading', { name: 'Volkswagen Golf 2.0 TDI' })).toBeInTheDocument();
     expect(screen.getByText(/15\.000,00\s€/)).toBeInTheDocument();
-    expect(screen.getByText(/2019 · 60\.000 km · Diesel · Manual/)).toBeInTheDocument();
+    for (const spec of ['2019', '60.000 km', 'Manual']) {
+      expect(screen.getByText(spec)).toBeInTheDocument();
+    }
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',
       '/vehicles/11111111-1111-4111-8111-111111111111',
@@ -68,6 +70,21 @@ describe('VehicleCard', () => {
     );
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByText('No photo yet')).toBeInTheDocument();
+  });
+
+  it('flags reserved cars', () => {
+    const { rerender } = render(
+      <ul>
+        <VehicleCard vehicle={vehicle()} />
+      </ul>,
+    );
+    expect(screen.queryByText('Reserved')).not.toBeInTheDocument();
+    rerender(
+      <ul>
+        <VehicleCard vehicle={vehicle({ status: 'RESERVED' })} />
+      </ul>,
+    );
+    expect(screen.getByText('Reserved')).toBeInTheDocument();
   });
 
   it('omits a missing variant cleanly', () => {

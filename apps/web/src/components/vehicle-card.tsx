@@ -11,7 +11,7 @@ export function VehicleCard({ vehicle, index = 0 }: { vehicle: Vehicle; index?: 
   return (
     <li
       style={{ animationDelay: `${Math.min(index, 8) * 70}ms` }}
-      className="group hover-lift glass-strong animate-rise overflow-hidden rounded-2xl focus-within:shadow-lift hover:border-indigo-200"
+      className="group hover-lift border border-white/80 bg-white/90 shadow-card animate-rise overflow-hidden rounded-2xl focus-within:shadow-lift hover:border-indigo-200"
     >
       <Link
         href={`/vehicles/${vehicle.id}`}
@@ -31,7 +31,7 @@ export function VehicleCard({ vehicle, index = 0 }: { vehicle: Vehicle; index?: 
               No photo yet
             </div>
           )}
-          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-white/70 bg-white/80 px-2.5 py-1 text-xs font-semibold text-slate-800 shadow-sm backdrop-blur-md">
+          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-white/70 bg-white/95 px-2.5 py-1 text-xs font-semibold text-slate-800 shadow-sm">
             {electric ? (
               <BoltIcon className="h-3.5 w-3.5 text-emerald-600" />
             ) : (
@@ -39,16 +39,31 @@ export function VehicleCard({ vehicle, index = 0 }: { vehicle: Vehicle; index?: 
             )}
             {FUEL_LABEL[vehicle.fuel]}
           </span>
+          {vehicle.status === 'RESERVED' && (
+            <span className="absolute right-3 top-3 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-900 ring-1 ring-inset ring-amber-300">
+              Reserved
+            </span>
+          )}
         </div>
         <div className="p-4">
-          <h3 className="truncate font-semibold text-slate-900">{title}</h3>
+          <h3 className="line-clamp-2 min-h-[2.75rem] font-semibold leading-snug text-slate-900">
+            {title}
+          </h3>
           <p className="mt-1 bg-gradient-to-r from-indigo-700 to-sky-600 bg-clip-text text-2xl font-bold tracking-tight text-transparent">
             {formatEuro(vehicle.priceCents)}
           </p>
-          <p className="mt-3 border-t border-slate-200/70 pt-3 text-sm text-slate-700">
-            {vehicle.year} · {formatKm(vehicle.mileage)} · {FUEL_LABEL[vehicle.fuel]} ·{' '}
-            {GEARBOX_LABEL[vehicle.gearbox]}
-          </p>
+          <ul className="mt-3 flex flex-wrap gap-1.5 border-t border-slate-200/70 pt-3 text-xs font-medium text-slate-700">
+            {[
+              String(vehicle.year),
+              formatKm(vehicle.mileage),
+              FUEL_LABEL[vehicle.fuel],
+              GEARBOX_LABEL[vehicle.gearbox],
+            ].map((spec) => (
+              <li key={spec} className="rounded-md bg-slate-100 px-2 py-1">
+                {spec}
+              </li>
+            ))}
+          </ul>
         </div>
       </Link>
     </li>

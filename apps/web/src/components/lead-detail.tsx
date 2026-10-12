@@ -201,7 +201,7 @@ export function LeadDetail({ id }: { id: string }) {
       </Link>
 
       <header className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold">{l.name}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{l.name}</h1>
         <LeadStatusBadge status={l.status} />
       </header>
 

@@ -41,10 +41,14 @@ export function VehicleEditor({ id }: { id: string }) {
         ← All vehicles
       </Link>
       <header className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold">{vehicleTitle(v)}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{vehicleTitle(v)}</h1>
         <VehicleStatusBadge status={v.status} />
       </header>
-      {!canEdit && <p className="text-sm text-slate-700">You have read-only access to vehicles.</p>}
+      {!canEdit && (
+        <p className="text-sm text-slate-700">
+          You have read-only access. Vehicle details cannot be changed.
+        </p>
+      )}
       {error && (
         <div
           role="alert"
@@ -92,7 +96,7 @@ export function NewVehicle() {
       <Link href="/admin/vehicles" className="text-sm text-blue-800 hover:underline">
         ← All vehicles
       </Link>
-      <h1 className="text-2xl font-bold">Add vehicle</h1>
+      <h1 className="text-3xl font-bold tracking-tight">Add vehicle</h1>
       <p className="text-sm text-slate-700">
         Save the vehicle first, then add photos on the next screen.
       </p>

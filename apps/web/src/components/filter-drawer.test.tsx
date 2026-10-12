@@ -36,6 +36,15 @@ describe('FilterDrawer', () => {
     expect(document.body.style.overflow).toBe('hidden'); // page does not scroll behind it
   });
 
+  it('moves focus inside the dialog when it opens', async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.click(screen.getByRole('button', { name: /Filters/ }));
+    expect(screen.getByRole('dialog', { name: 'Filters' })).toContainElement(
+      document.activeElement as HTMLElement,
+    );
+  });
+
   it('closes with the close button, with Escape, and returns focus to the opener', async () => {
     const user = userEvent.setup();
     setup();

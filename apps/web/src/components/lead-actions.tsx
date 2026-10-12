@@ -35,12 +35,14 @@ export function LeadStatusActions({
       </p>
     );
   }
+  // The first non-terminal-loss step is the natural next action; losing a lead stays quiet.
+  const primary = lead.allowedTransitions.find((t) => t !== 'LOST');
   return (
     <div className="flex flex-wrap gap-2" role="group" aria-label="Change status">
       {lead.allowedTransitions.map((to) => (
         <Button
           key={to}
-          variant={to === 'LOST' ? 'danger' : to === 'WON' ? 'primary' : 'secondary'}
+          variant={to === 'LOST' ? 'danger-outline' : to === primary ? 'primary' : 'secondary'}
           disabled={busy}
           onClick={() => {
             if (

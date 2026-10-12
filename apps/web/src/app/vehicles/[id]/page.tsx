@@ -4,8 +4,10 @@ import { notFound } from 'next/navigation';
 import { api, isApiError } from '@/lib/api';
 import { vehicleRevalidate } from '@/lib/cache';
 import { formatEuro, formatKm, FUEL_LABEL, GEARBOX_LABEL, vehicleTitle } from '@/lib/format';
+import { buttonClass } from '@/components/ui';
 import { Gallery } from '@/components/gallery';
 import { LeadForm } from '@/components/lead-form';
+import { VehicleJsonLd } from '@/components/vehicle-jsonld';
 import {
   CalendarIcon,
   GaugeIcon,
@@ -51,7 +53,8 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
   ];
 
   return (
-    <article>
+    <article className="pb-20 lg:pb-0">
+      <VehicleJsonLd vehicle={v} />
       <nav aria-label="Breadcrumb" className="mb-5 text-sm font-medium text-slate-700">
         <Link href="/vehicles" className="inline-flex items-center gap-1 hover:text-blue-800">
           <ChevronLeftIcon className="h-4 w-4" /> All cars
@@ -59,7 +62,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
       </nav>
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:gap-8">
-        <div className="lg:col-start-1 lg:row-start-1">
+        <div className="lg:col-start-1 lg:row-start-1 lg:self-start">
           <Gallery images={v.images} title={title} vehicle={v} />
         </div>
         <div className="space-y-5 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
@@ -93,14 +96,14 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
             </dl>
           </section>
 
-          <section className="glass rounded-2xl p-6">
+          <section id="enquiry" className="glass scroll-mt-24 rounded-2xl p-6">
             <LeadForm vehicleId={v.id} vehicleTitle={title} />
           </section>
         </div>
         {v.description && (
           <section
             aria-labelledby="desc-title"
-            className="glass rounded-2xl p-6 lg:col-start-1 lg:row-start-2"
+            className="glass rounded-2xl p-6 lg:col-start-1 lg:row-start-2 lg:self-start"
           >
             <h2 id="desc-title" className="text-lg font-semibold">
               Description
@@ -108,6 +111,13 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
             <p className="mt-2 whitespace-pre-line text-slate-800">{v.description}</p>
           </section>
         )}
+      </div>
+
+      <div className="glass-strong fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-white/70 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
+        <p className="text-lg font-bold tabular-nums text-blue-800">{formatEuro(v.priceCents)}</p>
+        <a href="#enquiry" className={buttonClass('primary')}>
+          Ask about this car
+        </a>
       </div>
     </article>
   );

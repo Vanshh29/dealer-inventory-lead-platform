@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { InboxIcon } from './icons';
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
+type Variant = 'primary' | 'secondary' | 'danger' | 'danger-outline' | 'ghost';
 
 const base =
   'inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 active:translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50';
@@ -12,6 +12,8 @@ const variants: Record<Variant, string> = {
   secondary: 'glass text-slate-900 hover:bg-white hover:border-indigo-300 hover:-translate-y-px',
   danger:
     'bg-gradient-to-b from-red-600 to-red-700 text-white shadow-md shadow-red-900/20 hover:from-red-700 hover:to-red-800',
+  'danger-outline':
+    'border border-red-300 bg-white/60 text-red-800 hover:border-red-500 hover:bg-red-50',
   ghost: 'text-slate-700 hover:bg-white/70',
 };
 
@@ -43,7 +45,7 @@ export function LinkButton({
 }
 
 export const inputClass =
-  'block w-full rounded-xl border border-slate-300 bg-white/80 px-3 py-2.5 text-sm text-slate-900 shadow-sm transition placeholder:text-slate-500 hover:border-indigo-300 focus-visible:border-indigo-600 focus-visible:bg-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-600 disabled:bg-slate-100';
+  'block w-full rounded-xl border border-slate-300 bg-white/80 px-3 py-2.5 text-sm text-slate-900 shadow-sm transition placeholder:text-slate-600 placeholder:italic hover:border-indigo-300 focus-visible:border-indigo-600 focus-visible:bg-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-700';
 
 /** Label + control + error text, wired together with ids for screen readers. */
 export function Field({
@@ -120,7 +122,15 @@ export function Spinner({ label = 'Loading…' }: { label?: string }) {
   );
 }
 
-export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
+export function EmptyState({
+  title,
+  children,
+  as: Heading = 'h2',
+}: {
+  title: string;
+  children?: ReactNode;
+  as?: 'h1' | 'h2';
+}) {
   return (
     <div className="glass animate-rise rounded-2xl border-dashed px-6 py-14 text-center">
       <span
@@ -129,7 +139,7 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
       >
         <InboxIcon className="h-6 w-6" />
       </span>
-      <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+      <Heading className="text-lg font-semibold text-slate-900">{title}</Heading>
       {children && <div className="mt-2 text-slate-600">{children}</div>}
     </div>
   );
@@ -166,26 +176,56 @@ export function Pagination({
   const pages = Math.max(1, Math.ceil(total / limit));
   if (pages <= 1) return null;
   const linkClass =
-    'glass rounded-xl px-4 py-2 text-sm font-medium transition hover:-translate-y-px hover:bg-white';
+    'glass rounded-xl px-4 py-2.5 text-sm font-medium transition hover:-translate-y-px hover:bg-white';
+  // First, last and the neighbours of the current page; gaps become an ellipsis.
+  const shown = Array.from({ length: pages }, (_, i) => i + 1).filter(
+    (p) => p === 1 || p === pages || Math.abs(p - page) <= 1,
+  );
   return (
-    <nav aria-label="Pagination" className="mt-8 flex items-center justify-between gap-4">
-      {page > 1 ? (
-        <Link href={hrefFor(page - 1)} rel="prev" className={linkClass}>
-          ← Previous
-        </Link>
-      ) : (
-        <span />
-      )}
+    <nav aria-label="Pagination" className="mt-8 flex flex-col items-center gap-3">
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        {page > 1 && (
+          <Link href={hrefFor(page - 1)} rel="prev" className={linkClass}>
+            ← Previous
+          </Link>
+        )}
+        <ol className="flex items-center gap-1.5">
+          {shown.map((p, i) => (
+            <li key={p} className="flex items-center gap-1.5">
+              {i > 0 && p - shown[i - 1] > 1 && (
+                <span aria-hidden="true" className="px-1 text-slate-600">
+                  …
+                </span>
+              )}
+              {p === page ? (
+                <span
+                  aria-current="page"
+                  aria-label={`Page ${p}`}
+                  className="flex h-11 min-w-11 items-center justify-center rounded-xl bg-brand px-3 text-sm font-semibold tabular-nums text-white"
+                >
+                  {p}
+                </span>
+              ) : (
+                <Link
+                  href={hrefFor(p)}
+                  aria-label={`Page ${p}`}
+                  className={`${linkClass} flex h-11 min-w-11 items-center justify-center !px-3 tabular-nums`}
+                >
+                  {p}
+                </Link>
+              )}
+            </li>
+          ))}
+        </ol>
+        {page < pages && (
+          <Link href={hrefFor(page + 1)} rel="next" className={linkClass}>
+            Next →
+          </Link>
+        )}
+      </div>
       <p className="text-sm text-slate-700" aria-live="polite">
         Page {page} of {pages}
       </p>
-      {page < pages ? (
-        <Link href={hrefFor(page + 1)} rel="next" className={linkClass}>
-          Next →
-        </Link>
-      ) : (
-        <span />
-      )}
     </nav>
   );
 }

@@ -45,7 +45,7 @@ export function ConsoleShell({ children }: { children: ReactNode }) {
       <aside className="mb-6 md:sticky md:top-24 md:mb-0 md:self-start">
         <nav
           aria-label="Back office"
-          className="flex gap-1 overflow-x-auto glass-strong rounded-2xl p-2 md:flex-col"
+          className="grid grid-cols-3 gap-1 glass-strong rounded-2xl p-2 md:flex md:flex-col"
         >
           {NAV.map(({ href, label, exact, icon: Icon }) => {
             const active = exact ? pathname === href : pathname.startsWith(href);
@@ -54,7 +54,7 @@ export function ConsoleShell({ children }: { children: ReactNode }) {
                 key={href}
                 href={href}
                 aria-current={active ? 'page' : undefined}
-                className={`flex items-center gap-2.5 whitespace-nowrap rounded-xl px-3.5 py-2.5 text-sm font-semibold transition duration-200 ${active ? 'bg-brand text-white shadow-md shadow-indigo-900/30' : 'text-slate-700 hover:translate-x-0.5 hover:bg-white/80 hover:text-indigo-700'}`}
+                className={`flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-2 py-2.5 text-xs sm:gap-2.5 sm:text-sm md:justify-start md:px-3.5 font-semibold transition duration-200 ${active ? 'bg-brand text-white shadow-md shadow-indigo-900/30' : 'text-slate-700 hover:translate-x-0.5 hover:bg-white/80 hover:text-indigo-700'}`}
               >
                 <Icon className="h-[1.1rem] w-[1.1rem]" />
                 {label}

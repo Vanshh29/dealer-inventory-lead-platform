@@ -3,6 +3,7 @@
 @theme {
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --color-focus: #4338ca;
   --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -8px rgb(30 41 120 / 0.14);
   --shadow-lift: 0 2px 4px rgb(15 23 42 / 0.05), 0 24px 48px -12px rgb(40 50 180 / 0.3);
   --shadow-glow: 0 0 0 1px rgb(255 255 255 / 0.4) inset, 0 10px 30px -6px rgb(79 70 229 / 0.5);
@@ -66,14 +67,29 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Aurora backdrop: soft colour fields the glass surfaces blur against. */
 body {
   background-color: #eef1fb;
+}
+
+/* Aurora backdrop: soft colour fields the glass surfaces blur against. A fixed pseudo-element
+   instead of background-attachment: fixed, which iOS Safari ignores. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-image:
     radial-gradient(60rem 34rem at 95% -8%, rgb(99 102 241 / 0.22), transparent 60%),
     radial-gradient(48rem 30rem at -8% 6%, rgb(14 165 233 / 0.18), transparent 60%),
     radial-gradient(44rem 28rem at 60% 105%, rgb(168 85 247 / 0.13), transparent 60%);
-  background-attachment: fixed;
+}
+
+@layer base {
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
 }
 
 ::selection {
@@ -101,7 +117,15 @@ body {
   backdrop-filter: blur(16px) saturate(150%);
   -webkit-backdrop-filter: blur(16px) saturate(150%);
 }
+/* Default stops meet AA (4.5:1+) on the light surfaces; the bright variant is for the dark hero. */
 @utility text-gradient {
+  background-image: linear-gradient(100deg, #0369a1, #4338ca 50%, #7e22ce);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility text-gradient-bright {
   background-image: linear-gradient(100deg, #38bdf8, #818cf8 50%, #c084fc);
   background-size: 200% 100%;
   -webkit-background-clip: text;
@@ -116,9 +140,11 @@ body {
     transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
     box-shadow 0.25s ease,
     border-color 0.25s ease;
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lift);
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lift);
+    }
   }
 }
 
@@ -140,17 +166,30 @@ body {
     transition: transform 0.8s ease;
     pointer-events: none;
   }
-  &:hover::after {
-    transform: translateX(120%);
+  @media (hover: hover) {
+    &:hover::after {
+      transform: translateX(120%);
+    }
   }
 }
 
-/* Scroll-linked reveal where supported; elsewhere content is simply visible. */
+/* Scroll-linked reveal where supported; elsewhere content is simply visible. Fill forwards only,
+   so nothing is hidden before the animation range starts or if it never runs. */
 @supports (animation-timeline: view()) {
-  .reveal {
-    animation: rise linear both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 35%;
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: rise linear forwards;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+/* Ambient float loops are decorative and costly on phones. */
+@media (max-width: 767px) {
+  .animate-float,
+  .animate-float-slow {
+    animation: none;
   }
 }
 

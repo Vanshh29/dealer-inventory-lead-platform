@@ -13,8 +13,8 @@ const QUICK_LINKS = [
   { label: 'Electric', href: '/vehicles?fuel=ELECTRIC' },
   { label: 'Diesel', href: '/vehicles?fuel=DIESEL' },
   { label: 'Automatic', href: '/vehicles?gearbox=AUTOMATIC' },
-  { label: 'Under €15,000', href: '/vehicles?priceMax=15000' },
-  { label: 'Low mileage', href: '/vehicles?mileageMax=50000' },
+  { label: 'Under €15,000', href: '/vehicles?maxPrice=15000' },
+  { label: 'Low mileage', href: '/vehicles?maxKm=50000' },
 ];
 
 const PROMISES = [
@@ -68,7 +68,9 @@ export default async function HomePage() {
               className="mt-5 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl"
             >
               Find the used car
-              <span className="text-gradient animate-gradient block">that fits your life.</span>
+              <span className="text-gradient-bright animate-gradient block">
+                that fits your life.
+              </span>
             </h1>
             <p className="mt-4 max-w-lg text-lg text-blue-100">
               Inspected cars with transparent prices. Search by make, model, fuel or any keyword.
@@ -82,7 +84,7 @@ export default async function HomePage() {
               <label htmlFor="home-q" className="sr-only">
                 Search cars
               </label>
-              <span aria-hidden="true" className="flex items-center pl-3 text-slate-500">
+              <span aria-hidden="true" className="flex items-center pl-3 text-slate-600">
                 <SearchIcon className="h-5 w-5" />
               </span>
               <input

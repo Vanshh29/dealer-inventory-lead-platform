@@ -103,7 +103,7 @@ export function VehiclesView() {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Vehicles</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Vehicles</h1>
         {canManageVehicles(user.role) && (
           <LinkButton href="/admin/vehicles/new">Add vehicle</LinkButton>
         )}
