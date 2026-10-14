@@ -18,7 +18,7 @@ export default function OpengraphImage() {
         background: 'linear-gradient(135deg,#0b1030,#1e1b6b 45%,#1d4ed8)',
       }}
     >
-      <div style={{ fontSize: 120, fontWeight: 800, letterSpacing: -3 }}>Carvio.</div>
+      <div style={{ fontSize: 120, fontWeight: 800, letterSpacing: -3 }}>Carvio</div>
       <div style={{ marginTop: 20, fontSize: 44, color: '#c7d2fe' }}>
         Inspected used cars. Transparent prices.
       </div>

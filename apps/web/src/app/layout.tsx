@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 text-sm text-slate-700 sm:grid-cols-3">
             <div>
               <p className="text-base font-bold text-slate-900">
-                Carvio<span className="text-gradient">.</span>
+                Carvio
               </p>
               <p className="mt-2 max-w-xs">
                 Quality used cars with transparent pricing and a straightforward buying process.

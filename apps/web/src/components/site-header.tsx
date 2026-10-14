@@ -13,7 +13,7 @@ export function SiteHeader() {
             <CarIcon className="h-5 w-5" />
           </span>
           <span className="text-slate-900">
-            Carvio<span className="text-gradient animate-gradient">.</span>
+            Carvio
           </span>
         </Link>
         <nav aria-label="Main" className="flex items-center gap-1 text-sm font-medium">
