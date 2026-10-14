@@ -69,6 +69,8 @@ html {
 
 body {
   background-color: #eef1fb;
+  /* the full-width hero is sized to 100vw, which includes the scrollbar */
+  overflow-x: clip;
 }
 
 /* Aurora backdrop: soft colour fields the glass surfaces blur against. A fixed pseudo-element

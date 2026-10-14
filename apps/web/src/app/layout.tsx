@@ -22,11 +22,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <SiteHeader />
-        <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+        <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
           {children}
         </main>
         <footer className="mt-16 border-t border-white/60 bg-white/50 backdrop-blur-xl">
-          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 text-sm text-slate-700 sm:grid-cols-3">
+          <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 text-sm text-slate-700 sm:grid-cols-3">
             <div>
               <p className="text-base font-bold text-slate-900">
                 Carvio

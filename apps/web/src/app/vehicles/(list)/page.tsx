@@ -67,7 +67,7 @@ export default async function CatalogPage({
             ) : (
               <div className="mt-4">
                 <h2 className="sr-only">Results</h2>
-                <VehicleGrid vehicles={result.value.items} />
+                <VehicleGrid vehicles={result.value.items} wide />
                 <Pagination
                   page={result.value.page}
                   limit={result.value.limit}

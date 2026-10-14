@@ -48,7 +48,7 @@ export default async function HomePage() {
     <div className="space-y-16">
       <section
         aria-labelledby="hero-title"
-        className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#0b1030,#1e1b6b_45%,#1d4ed8_100%)] px-6 py-14 text-white shadow-lift sm:px-12 sm:py-20"
+        className="relative -mt-8 ml-[calc(50%-50vw)] w-screen overflow-hidden bg-[linear-gradient(135deg,#0b1030,#1e1b6b_45%,#1d4ed8_100%)] py-14 text-white shadow-lift sm:py-20"
       >
         <div
           aria-hidden="true"
@@ -58,7 +58,7 @@ export default async function HomePage() {
           aria-hidden="true"
           className="pointer-events-none absolute -bottom-32 left-1/3 h-80 w-80 animate-float-slow rounded-full bg-fuchsia-500/30 blur-3xl"
         />
-        <div className="relative grid items-center gap-10 lg:grid-cols-[1.15fr_1fr]">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.15fr_1fr] lg:px-10">
           <div className="animate-rise">
             <p className="glass-dark inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium text-blue-50">
               <BoltIcon className="h-4 w-4" /> New arrivals every week

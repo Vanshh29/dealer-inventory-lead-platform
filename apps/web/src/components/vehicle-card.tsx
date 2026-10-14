@@ -70,9 +70,9 @@ export function VehicleCard({ vehicle, index = 0 }: { vehicle: Vehicle; index?: 
   );
 }
 
-export function VehicleGrid({ vehicles }: { vehicles: Vehicle[] }) {
+export function VehicleGrid({ vehicles, wide = false }: { vehicles: Vehicle[]; wide?: boolean }) {
   return (
-    <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3${wide ? ' xl:grid-cols-4' : ''}`}>
       {vehicles.map((v, i) => (
         <VehicleCard key={v.id} vehicle={v} index={i} />
       ))}

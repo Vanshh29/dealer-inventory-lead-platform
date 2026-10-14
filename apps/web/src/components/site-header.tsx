@@ -4,7 +4,7 @@ import { CarIcon } from './icons';
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-white/60 bg-white/60 shadow-[0_8px_30px_-12px_rgb(40_50_180/0.25)] backdrop-blur-xl backdrop-saturate-150">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <Link href="/" className="group flex items-center gap-2.5 text-lg font-bold tracking-tight">
           <span
             aria-hidden="true"

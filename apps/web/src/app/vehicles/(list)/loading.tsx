@@ -26,7 +26,7 @@ export default function Loading() {
       <div className="hidden h-96 animate-pulse rounded-2xl bg-slate-200 lg:block" />
       <div>
         <div className="h-9 w-32 animate-pulse rounded bg-slate-200" />
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 6 }, (_, i) => (
             <CardSkeleton key={i} />
           ))}
