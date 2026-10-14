@@ -2,6 +2,8 @@
 
 **Dealer inventory and lead platform.** A public catalog with full-text search, lead capture, and a role-based back office to work the lead pipeline. TypeScript end to end: Next.js, NestJS, PostgreSQL + Prisma, REST (OpenAPI) and a read-only GraphQL layer, Docker, GitHub Actions.
 
+**Live demo: <https://carvio-self.vercel.app>.** Browse the catalog, open a car and send an enquiry (please use made-up details). The staff back office is at `/admin`; its logins on the hosted demo are private and are not the local demo passwords documented below.
+
 ![Home page](docs/screenshots/home.png)
 
 ![Catalog with filters](docs/screenshots/catalog.png)
@@ -53,7 +55,7 @@ docker compose up --build
 - GraphQL (read-only catalog, `POST`): http://localhost:4000/graphql, see `docs/architecture.md` for an example
 - Staff back office: http://localhost:3000/admin (demo logins below)
 
-The API applies migrations on start. Seed demo data: three users (admin/sales/viewer `@carvio.test`, password `Passw0rd!Passw0rd!`, local use only) 240 vehicles (`SEED_VEHICLES=n`) and 40 demo leads (`SEED_LEADS=n`). Safe to run repeatedly:
+The API applies migrations on start. Seed demo data: three users (admin/sales/viewer `@carvio.test`, password `Passw0rd!Passw0rd!`, **local use only**; the hosted demo uses different, private passwords) 240 vehicles (`SEED_VEHICLES=n`) and 40 demo leads (`SEED_LEADS=n`). Safe to run repeatedly:
 
 ```bash
 docker compose exec api ./node_modules/.bin/tsx prisma/seed.ts
@@ -101,8 +103,25 @@ Search performance numbers (measured, with caveats): `docs/architecture.md`.
 ## Using the site
 
 - **Public:** `/` search and latest cars · `/vehicles` catalog with filters, sorting and pagination (state is in the URL) · `/vehicles/<id>` photos, specs and the enquiry form.
-- **Back office** (`/admin`, log in with `admin@carvio.test`, `sales@carvio.test` or `viewer@carvio.test`, password `Passw0rd!Passw0rd!`): dashboard with pipeline counts · **Leads** table (filter by status, search, open a lead to change status, assign, add notes; admins also see its history) · **Vehicles** (create, edit, photos, delete: admin only).
+- **Back office** (`/admin`, log in with `admin@carvio.test`, `sales@carvio.test` or `viewer@carvio.test`, local password `Passw0rd!Passw0rd!`; the hosted demo's logins are private): dashboard with pipeline counts · **Leads** table (filter by status, search, open a lead to change status, assign, add notes; admins also see its history) · **Vehicles** (create, edit, photos, delete: admin only).
 - Roles: ADMIN everything · SALES works leads and notes, reads vehicles · VIEWER read-only. The server enforces this; the UI only hides what you cannot do.
+
+## Hosted demo
+
+The live demo runs on free tiers of three services:
+
+| Part | Where | Notes |
+| --- | --- | --- |
+| Website (Next.js) | Vercel | Calls `/backend/*` on its own domain; Next forwards that to the API, so login cookies stay first-party |
+| API (NestJS, Docker) | Render | Free instances sleep when idle, so the first visit after a quiet period can take 30-60 seconds |
+| Database (PostgreSQL) | Neon | Reached through Neon's connection pooler |
+
+Settings (names only; values are kept in each service's dashboard and never committed):
+
+- **Vercel:** `NEXT_PUBLIC_API_URL` (the site's own `/backend` path), `NEXT_PUBLIC_SITE_URL`, `API_INTERNAL_URL`, `API_PROXY_TARGET`. `NEXT_PUBLIC_*` values are baked in at build time, so redeploy after changing them.
+- **Render:** `DATABASE_URL`, `JWT_ACCESS_SECRET`, `CORS_ORIGIN`, `COOKIE_SECURE`, `REFRESH_COOKIE_PATH` (`/backend/auth` behind the proxy) and `PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1`. The last one is needed because Prisma's migration lock times out through a connection pooler.
+
+Staff passwords on the hosted demo are not the local seed defaults. Seeding only creates users and never overwrites an existing password, so change a hosted password in the database, not by re-running the seed.
 
 ## Browser tests (Playwright)
 
