@@ -33,7 +33,8 @@ export interface HttpConfig {
 }
 
 export function buildUrl(baseUrl: string, path: string, query?: Query): string {
-  const url = new URL(path, baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`);
+  // A leading slash would replace any path on the base (e.g. a /backend proxy prefix).
+  const url = new URL(path.replace(/^\/+/, ''), baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`);
   for (const [key, value] of Object.entries(query ?? {})) {
     if (value === undefined || value === null || value === '') continue;
     url.searchParams.set(key, String(value));

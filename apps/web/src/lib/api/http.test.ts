@@ -44,6 +44,12 @@ describe('buildUrl', () => {
   it('works with a trailing slash on the base URL', () => {
     expect(buildUrl('http://api.test/', '/health')).toBe('http://api.test/health');
   });
+
+  it('keeps a path prefix on the base, as used behind the /backend proxy', () => {
+    expect(buildUrl('https://site.test/backend', '/auth/login')).toBe(
+      'https://site.test/backend/auth/login',
+    );
+  });
 });
 
 describe('request', () => {
