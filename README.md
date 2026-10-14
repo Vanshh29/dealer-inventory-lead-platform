@@ -2,7 +2,7 @@
 
 **Dealer inventory and lead platform.** A public catalog with full-text search, lead capture, and a role-based back office to work the lead pipeline. TypeScript end to end: Next.js, NestJS, PostgreSQL + Prisma, REST (OpenAPI) and a read-only GraphQL layer, Docker, GitHub Actions.
 
-**Live demo: <https://carvio-self.vercel.app>.** Browse the catalog, open a car and send an enquiry (please use made-up details). The staff back office is at `/admin`; its logins on the hosted demo are private and are not the local demo passwords documented below.
+**Live demo: <https://carvio-self.vercel.app>.** Browse the catalog, open a car and send an enquiry (please use made-up details). To look around the staff back office, sign in at `/admin/login` with the read-only viewer account (`viewer@carvio.test`, password `i6Q2A-5zNNx-93CE7-Mzfdz`). The admin and sales accounts are private.
 
 ![Home page](docs/screenshots/home.png)
 
@@ -121,7 +121,7 @@ Settings (names only; values are kept in each service's dashboard and never comm
 - **Vercel:** `NEXT_PUBLIC_API_URL` (the site's own `/backend` path), `NEXT_PUBLIC_SITE_URL`, `API_INTERNAL_URL`, `API_PROXY_TARGET`. `NEXT_PUBLIC_*` values are baked in at build time, so redeploy after changing them.
 - **Render:** `DATABASE_URL`, `JWT_ACCESS_SECRET`, `CORS_ORIGIN`, `COOKIE_SECURE`, `REFRESH_COOKIE_PATH` (`/backend/auth` behind the proxy) and `PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1`. The last one is needed because Prisma's migration lock times out through a connection pooler.
 
-Staff passwords on the hosted demo are not the local seed defaults. Seeding only creates users and never overwrites an existing password, so change a hosted password in the database, not by re-running the seed.
+The hosted demo's public login is the read-only viewer account above; admin and sales passwords are private. They are not the local seed defaults. Seeding only creates users and never overwrites an existing password, so change a hosted password in the database, not by re-running the seed.
 
 ## Browser tests (Playwright)
 
