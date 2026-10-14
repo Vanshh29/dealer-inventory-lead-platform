@@ -22,15 +22,23 @@ const base = (): CookieOptions => ({
   secure: (process.env.COOKIE_SECURE ?? String(process.env.NODE_ENV === 'production')) === 'true',
 });
 
+// Normally /auth. Behind a path-prefixed proxy (see apps/web/next.config.mjs) the browser sees it
+// as e.g. /backend/auth, so the path is configurable.
+const refreshPath = (): string => process.env.REFRESH_COOKIE_PATH ?? '/auth';
+
 function setAuthCookies(res: Response, t: IssuedTokens): void {
   res.cookie(ACCESS_COOKIE, t.accessToken, { ...base(), path: '/', maxAge: ACCESS_TTL_MS });
   // Scoped to /auth so the long-lived token is not sent with every API request.
-  res.cookie(REFRESH_COOKIE, t.refreshToken, { ...base(), path: '/auth', maxAge: REFRESH_TTL_MS });
+  res.cookie(REFRESH_COOKIE, t.refreshToken, {
+    ...base(),
+    path: refreshPath(),
+    maxAge: REFRESH_TTL_MS,
+  });
 }
 
 function clearAuthCookies(res: Response): void {
   res.clearCookie(ACCESS_COOKIE, { ...base(), path: '/' });
-  res.clearCookie(REFRESH_COOKIE, { ...base(), path: '/auth' });
+  res.clearCookie(REFRESH_COOKIE, { ...base(), path: refreshPath() });
 }
 
 const refreshCookie = (req: Request): string | undefined =>
