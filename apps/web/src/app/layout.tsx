@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div>
               <p className="font-semibold text-slate-900">About this site</p>
               <p className="mt-2">
-                Carvio is a portfolio project. All vehicles, photos and people are fictional.
+                Demo site. All vehicles, photos and people are fictional.
               </p>
             </div>
           </div>
